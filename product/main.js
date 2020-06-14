@@ -1,3 +1,5 @@
+`use strict`;
+
 window.onload = function () {
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innterWidth / window.innerHeight, 0.1, 1000);
