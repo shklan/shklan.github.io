@@ -26,7 +26,7 @@ window.onload = function () {
     }
 
     animate();
-}
+};
 
 
 
