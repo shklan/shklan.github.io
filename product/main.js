@@ -19,6 +19,7 @@ let animate = function () {
     requestAnimationFrame(animate);
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
+    console.log("yeah");
     renderer.render(scene, camera);
 }
 
