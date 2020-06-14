@@ -10,7 +10,7 @@ window.onload = function () {
     document.body.appendChild(renderer.domElement);
 
     let geometry = new THREE.BoxGeometry();
-    let material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+    let material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
     let cube = new THREE.Mesh(geometry, material);
 
     scene.add(cube);
@@ -21,9 +21,8 @@ window.onload = function () {
         requestAnimationFrame(animate);
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
-        console.log("yeah");
         renderer.render(scene, camera);
-    }
+    };
 
     animate();
 };
