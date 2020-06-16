@@ -6,8 +6,12 @@ window.onload = function () {
     let renderer = new THREE.WebGLRenderer();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     document.body.appendChild(renderer.domElement);
+
+    let light = new THREE.PointLight(0x0fffff);
+    
+    light.position.set(2, 2, 2);
+    scene.add(light);
 
     let geometry = new THREE.BoxGeometry();
     let material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
