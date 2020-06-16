@@ -13,17 +13,22 @@ window.onload = function () {
     let cube = new THREE.Mesh(geometry, material);
 
     scene.add(cube);
+    console.log("add cube");
 
     let light = new THREE.PointLight(0x0fffff);
     
     light.position.set(2, 2, 2);
     scene.add(light);
+    console.log("add light");
 
     camera.position.z = 3;
 
-    renderer.render(scene, camera);
+    console.log("rendering...");
+    render(renderer, scene, camera);
 };
 
-
+function render(renderer, scene, camera) {
+    renderer.render(scene, camera);
+};
 
 
