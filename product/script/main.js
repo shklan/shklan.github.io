@@ -1,7 +1,10 @@
 `use strict`;
 
 window.onload = function () {
-    const base = document.createElement("canvas", {"width": window.innerWidth, "height": window.innerHeight});
+    const base = document.createElement("canvas");
+    base.width = window.innerWidth;
+    base.height = window.innerHeight;
+    
     document.getElementById("Canvas").appendChild(base);
 
     let scene = new THREE.Scene();
