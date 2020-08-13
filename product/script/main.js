@@ -4,8 +4,8 @@ window.onload = function () {
     const base = document.createElement("canvas");
     base.width = window.innerWidth;
     base.height = window.innerHeight;
-    
-    document.getElementById("Canvas").appendChild(base);
+
+    document.getElementsByClassName("Canvas")[0].appendChild(base);
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(45, window.innterWidth / window.innerHeight, 0.1, 1000);
