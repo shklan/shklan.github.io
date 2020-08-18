@@ -2,11 +2,6 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/105/thre
 `use strict`;
 
 window.onload = function () {
-    // const base = document.createElement("canvas");
-    // base.width = window.innerWidth;
-    // base.height = window.innerHeight;
-
-    // document.getElementsByClassName("Canvas")[0].appendChild(base);
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(45, window.innterWidth / window.innerHeight, 0.1, 1000);
@@ -21,20 +16,15 @@ window.onload = function () {
     scene.add(cube);
     console.log("add cube");
 
-    let light = new THREE.PointLight(0x0fffff);
-    
-    light.position.set(2, 2, 2);
-    scene.add(light);
-    console.log("add light");
-
-    camera.position.z = 3;
+    camera.position.z = 5;
 
     console.log("rendering...");
-    render(renderer, scene, camera);
+    renderer.render(scene, camera);
 };
 
 function render(renderer, scene, camera) {
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
 };
 
 
