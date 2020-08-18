@@ -1,4 +1,4 @@
-import * as THREE from 'https://shklan.github.io/product/script/lib/three.module.js';
+import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.module.js';
 `use strict`;
 
 window.onload = function () {
