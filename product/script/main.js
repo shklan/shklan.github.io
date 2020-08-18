@@ -14,12 +14,14 @@ window.onload = function () {
     let cube = new THREE.Mesh(geometry, material);
 
     scene.add(cube);
-    console.log("add cube");
+    console.log(cube);
+    console.log(scene);
+    console.log(camera);
 
     camera.position.z = 5;
 
     console.log("rendering...");
-    renderer.render(scene, camera);
+    render(renderer, scene, camera);
 };
 
 function render(renderer, scene, camera) {
