@@ -1,4 +1,4 @@
-import * as THREE from './lib/three.moduje.js';
+import * as THREE from 'https://shklan.github.io/product/script/lib/three.module.js';
 `use strict`;
 
 window.onload = function () {
