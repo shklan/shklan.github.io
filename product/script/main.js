@@ -1,3 +1,4 @@
+import * as THREE from './lib/three.moduje.js';
 `use strict`;
 
 window.onload = function () {
