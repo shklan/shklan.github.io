@@ -26,7 +26,7 @@ window.onload = function () {
 
 function render(renderer, scene, camera) {
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
+    requestAnimationFrame(render, renderer, scene, camera);
 };
 
 
