@@ -40,6 +40,9 @@ class SceneRenderer {
 
     render() {
         this.renderer.render(this.scene, this.camera);
-        requestAnimationFrame(this.render.bind(this));
+        stamp = requestAnimationFrame(this.render.bind(this));
+        console.log(renderer, scene, camera);
+        console.log(stamp);
+        cancelAnimationFrame(stamp);
     }
 }
