@@ -19,6 +19,7 @@ window.onload = function () {
     console.log(camera);
 
     camera.position.z = 5;
+    camera.lookAt(scene.position);
 
     console.log("rendering...");
     let scenerenderer = new SceneRenderer(renderer, scene, camera);
