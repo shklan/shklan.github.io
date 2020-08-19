@@ -21,13 +21,20 @@ window.onload = function () {
     camera.position.z = 5;
 
     console.log("rendering...");
-    render(renderer, scene, camera);
-};
-
-function render(renderer, scene, camera) {
-    console.log(renderer);
-    renderer.render(scene, camera);
-    requestAnimationFrame(render, renderer, scene, camera);
+    let scenerenderer = new SceneRenderer(renderer, scene, camera);
+    scenerenderer.render();
 };
 
 
+class SceneRenderer {
+    constructor(renderer, scene, camera) {
+        this.#renderer = renderer;
+        this.#scene = scene;
+        this.#camera = camera;
+    }
+
+    render() {
+        this.#renderer.render(this.#scene, this.#camera);
+        requestAnimationFrame(this.render.bind(this));
+    }
+}
