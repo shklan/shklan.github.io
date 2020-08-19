@@ -9,17 +9,21 @@ window.onload = function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementsByClassName("Canvas")[0].appendChild(renderer.domElement);
 
-    let geometry = new THREE.BoxGeometry();
-    let material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+    let geometry = new THREE.BoxGeometry(1, 1, 1);
+    let material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
     let cube = new THREE.Mesh(geometry, material);
+    let light = new THREE.PointLight(0x00ffff);
 
+    // setting
+    camera.position.z = 5;
+    camera.lookAt(scene.position);
+    light.position.set(2, 2, 2);
+
+    scene.add(light);
     scene.add(cube);
     console.log(cube);
     console.log(scene);
     console.log(camera);
-
-    camera.position.z = 5;
-    camera.lookAt(scene.position);
 
     console.log("rendering...");
     let scenerenderer = new SceneRenderer(renderer, scene, camera);
