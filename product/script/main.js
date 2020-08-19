@@ -21,9 +21,6 @@ window.onload = function () {
 
     scene.add(light);
     scene.add(cube);
-    console.log(cube);
-    console.log(scene);
-    console.log(camera);
 
     console.log("rendering...");
     let scenerenderer = new SceneRenderer(renderer, scene, camera);
@@ -40,9 +37,34 @@ class SceneRenderer {
 
     render() {
         this.renderer.render(this.scene, this.camera);
-        const stamp = requestAnimationFrame(this.render.bind(this));
-        console.log(renderer, scene, camera);
-        console.log(stamp);
-        cancelAnimationFrame(stamp);
+        this.stamp = requestAnimationFrame(this.render.bind(this));
+        console.log(this.renderer, this.scene, this.camera);
+    }
+}
+
+class KeydownListener extends EventTarget {
+    constructor() {
+        this.events = [];
+    }
+
+    addAction(key, action) {
+        this.events.push({key: key, action: action});
+    }
+
+    listen() {
+        this.addEventListener("keydown", this.handle.bind(this));
+    }
+
+    close() {
+        this.removeEventListener("keydown", this.handle.bind(this));
+    }
+
+    handle(event) {
+        const code = event.key;
+        this.events.forEach(e => {
+            if (e["key"] == code) {
+                e["action"]();
+            }            
+        });
     }
 }
