@@ -1,5 +1,5 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.module.js';
-`use strict`;
+// `use strict`;
 
 window.onload = function () {
 
