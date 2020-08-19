@@ -4,8 +4,8 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/105/thre
 window.onload = function () {
 
     let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(45, window.innterWidth / window.innerHeight, 0.1, 1000);
-    let renderer = new THREE.WebGLRenderer();
+    let camera = new THREE.PerspectiveCamera(45, window.innterWidth / window.innerHeight, 1, 10);
+    let renderer = new THREE.WebGLRenderer({ alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementsByClassName("Canvas")[0].appendChild(renderer.domElement);
 
