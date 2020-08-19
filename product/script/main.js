@@ -28,13 +28,13 @@ window.onload = function () {
 
 class SceneRenderer {
     constructor(renderer, scene, camera) {
-        this.#renderer = renderer;
-        this.#scene = scene;
-        this.#camera = camera;
+        this.renderer = renderer;
+        this.scene = scene;
+        this.camera = camera;
     }
 
     render() {
-        this.#renderer.render(this.#scene, this.#camera);
+        this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(this.render.bind(this));
     }
 }
