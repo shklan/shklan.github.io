@@ -1,1 +1,9 @@
 product/script/lib
+
+product/package-lock.json
+
+product/package.json
+
+product/node_modules
+
+makefile
