@@ -42,7 +42,7 @@ function _printData(output, data) {
     const keys = Object.keys(data);
     for (let i=0, l=keys.length; i<l; i++) {
         value = data[keys[i]];
-        if (value.split("％")[0] > 75) {
+        if (parseInt(value.split("％")[0], 10) > 75) {
             output.innerHTML += '<font color = "red">' + keys[i] + ": " + value + "</font><br>";
         } else {
             output.innerHTML += keys[i] + ": " + value + "<br>";
@@ -84,6 +84,7 @@ function _extractProfile(text, data) {
 }
 
 function _extractStatus(text, data) {
+    console.log(text);
     tokens = text.split("■技能■")[1].split(/\n|\s|　/)
     for(let i=0, l=tokens.length; i<l; i++) {
         if (tokens[i] == "■戦闘■") {
