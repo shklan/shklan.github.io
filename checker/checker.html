@@ -7,8 +7,8 @@
             TRPG character sheet checker
         </title>
         <style>
-            form {width: 100%; padding: 5px;}
-            .output {width: 1080px; display: flex; margin: 0; padding: 0;}
+            form {width: 100%; padding: 5px; }
+            .output {width: 1080px; display: flex; margin: 0 auto; padding: 0;}
             #dropzone {min-height: 60px; background-color: #eee;}
             #status {display: block; width: 540px;}
             #profile {display: block; width: 540px;}
@@ -23,16 +23,18 @@
             </div>
             <div id="clear">
                 <input id="Reset" multiple type="reset", value="クリア">
-            </div>
-            <div class="output">
-                <div class="left-column">
-                    <div id="status"></div>
-                </div>
-                <div class="right-column">
-                    <div id="profile"></div>
-                </div>
-            </div>
+            </div> 
         </form>
+        <div class="output">
+            <div class="left-column">
+                <div id="status"></div>
+            </div>
+            <div class="right-column">
+                <div id="profile"></div>
+            </div>
+        </div>
+        <div class="settings">
+        </div>
     </body>
 
 </html>

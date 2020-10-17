@@ -17,13 +17,15 @@ function validate_input() {
 function validate_drop(dropfiles) {
     dropfiles.preventDefault();
     const files = dropfiles.dataTransfer.files;
+    document.getElementById("fileInput").files = files;
     _validate(files);
     dropfiles.dataTransfer.files = null;
 }
 
 function clear() {
     document.getElementById("fileInput").files = null;
-    document.getElementById("output").innerText = "";
+    document.getElementById("status").innerHTML = "";
+    document.getElementById("profile").innerHTML = "";
 }
 
 async function _validate(files) {
@@ -55,7 +57,13 @@ function _printProfile(output, data) {
     const keys = Object.keys(data);
     for (let i=0, l=keys.length; i<l; i++) {
         value = data[keys[i]];
-        output.innerHTML += keys[i] + ": " + value + "<br>";
+        console.log(value.length)
+        console.log(value)
+        if (value == "") {
+            output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
+        } else {
+            output.innerHTML += keys[i] + ": " + value + "<br>";
+        }
     }
 }
 
