@@ -29,16 +29,18 @@ function clear() {
 async function _validate(files) {
     console.log("validation start");
     const files_len = files.length;
-    const output = document.getElementById("output");
+    const status_output = document.getElementById("status");
+    const profile_output = document.getElementById("profile");
     for (let i=0; i<files_len; i++) {
         const file = files[i];
         const file_data = await _extractData(file);
-        _printData(output, file_data);
+        _printStatus(status_output, file_data["status"]);
+        _printStatus(profile_output, file_data["profile"]);
         output.innerHTML += file.name + "<br>"; 
     }
 }
 
-function _printData(output, data) {
+function _printStatus(output, data) {
     const keys = Object.keys(data);
     for (let i=0, l=keys.length; i<l; i++) {
         value = data[keys[i]];
@@ -50,17 +52,26 @@ function _printData(output, data) {
     }
 }
 
+function _printProfile(output, data) {
+    const keys = Object.keys(data);
+    for (let i=0, l=keys.length; i<l; i++) {
+        value = data[keys[i]];
+        output.innerHTML += keys[i] + ": " + value + "<br>";
+    }
+}
+
 async function _extractData(file) {
     let data = {};
     let text = await _read(file);
-    data = _extractProfile(text, data);
-    data = _extractStatus(text, data);
-    data = _extractSkills(text, data);
+    data["profile"] = _extractProfile(text);
+    data["status"] = _extractStatus(text);
+    data["skills"] = _extractSkills(text);
     return data;
 }
 
-function _extractProfile(text, data) {
-    tokens = text.split(/(\n| \/ )/);
+function _extractProfile(text) {
+    let data = {};
+    let tokens = text.split(/(\n| \/ )/);
     for(let i=0, l=tokens.length; i<l; i++) {
         if (tokens[i] == "■能力値■") {
             break;
@@ -83,9 +94,10 @@ function _extractProfile(text, data) {
     return {}; //data;
 }
 
-function _extractStatus(text, data) {
+function _extractStatus(text) {
+    let data = {};
     console.log(text);
-    tokens = text.split("■技能■")[1].split(/\n|\s|　/)
+    let tokens = text.split("■技能■")[1].split(/\n|\s|　/)
     for(let i=0, l=tokens.length; i<l; i++) {
         if (tokens[i] == "■戦闘■") {
             break;
@@ -106,13 +118,14 @@ function _extractStatus(text, data) {
     return data;
 }
 
+function _extractSkills(text) {
+    let data = {};
+    return data;
+}
+
 function _nextNum(i, tokens) {
     while (tokens[i].length==0) i++;
     return tokens[i];
-}
-
-function _extractSkills(text, data) {
-    return data;
 }
 
 function _read(file) {

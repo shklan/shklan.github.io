@@ -9,6 +9,8 @@
         <style>
             canvas {display: block; margin-left: auto; margin-right: auto;}
             #dropzone {min-height: 60px; background-color: #eee;}
+            #status {width: 50%;}
+            #profile {width: 50%;}
         </style>
     </head>
     
@@ -17,8 +19,13 @@
             <div id="dropzone", effectAllowed="move">
                 <input id="fileInput" multiple type="file">
             </div>
-            <div id="output">
+            <div class="output">
+                <div id="status">
 
+                </div>
+                <div id="profile">
+
+                </div>
             </div>
             <div id="clear">
                 <input id="Reset" multiple type="reset", value="クリア">
