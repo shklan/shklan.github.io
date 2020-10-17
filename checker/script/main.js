@@ -59,7 +59,7 @@ function _printProfile(output, data) {
         value = data[keys[i]];
         console.log(value.length)
         console.log(value)
-        if (value == "") {
+        if (value == "" | value == "\r") {
             output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
         } else {
             output.innerHTML += keys[i] + ": " + value + "<br>";
