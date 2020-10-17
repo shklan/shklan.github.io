@@ -35,8 +35,7 @@ async function _validate(files) {
         const file = files[i];
         const file_data = await _extractData(file);
         _printStatus(status_output, file_data["status"]);
-        _printStatus(profile_output, file_data["profile"]);
-        output.innerHTML += file.name + "<br>"; 
+        _printProfile(profile_output, file_data["profile"]);
     }
 }
 
@@ -77,26 +76,24 @@ function _extractProfile(text) {
             break;
         }
         const text = tokens[i].split("：")
-        // console.log(text[0])
         switch(text[0]) {
-            case "キャラクター名": data["name"]=text[1]; break;
-            case "職業": data["job"]=text[1]; break;
-            case "年齢": data["age"]=text[1]; break;
-            case "性別": data["sex"]=text[1]; break;
-            case "出身": data["from"]=text[1]; break;
-            case "髪の色": data["hair_c"]=text[1]; break;
-            case "瞳の色": data["eye_c"]=text[1]; break;
-            case "肌の色": data["skin_c"]=text[1]; break;
-            case "身長": data["length"]=text[1]; break;
-            case "体重": data["weight"]=text[1]; break;
+            case "キャラクター名": data["キャラクター名"]=text[1]; break;
+            case "職業": data["職業"]=text[1]; break;
+            case "年齢": data["年齢"]=text[1]; break;
+            case "性別": data["性別"]=text[1]; break;
+            case "出身": data["出身"]=text[1]; break;
+            case "髪の色": data["髪の色"]=text[1]; break;
+            case "瞳の色": data["瞳の色"]=text[1]; break;
+            case "肌の色": data["肌の色"]=text[1]; break;
+            case "身長": data["身長"]=text[1]; break;
+            case "体重": data["体重"]=text[1]; break;
         }
     }
-    return {}; //data;
+    return data;
 }
 
 function _extractStatus(text) {
     let data = {};
-    console.log(text);
     let tokens = text.split("■技能■")[1].split(/\n|\s|　/)
     for(let i=0, l=tokens.length; i<l; i++) {
         if (tokens[i] == "■戦闘■") {

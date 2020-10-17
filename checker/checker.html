@@ -7,10 +7,12 @@
             TRPG character sheet checker
         </title>
         <style>
-            canvas {display: block; margin-left: auto; margin-right: auto;}
+            form {width: 100%; padding: 5px;}
+            .output {width: 1080px; display: flex; margin: 0; padding: 0;}
             #dropzone {min-height: 60px; background-color: #eee;}
-            #status {width: 50%;}
-            #profile {width: 50%;}
+            #status {display: block; width: 540px;}
+            #profile {display: block; width: 540px;}
+            
         </style>
     </head>
     
@@ -19,16 +21,16 @@
             <div id="dropzone", effectAllowed="move">
                 <input id="fileInput" multiple type="file">
             </div>
-            <div class="output">
-                <div id="status">
-
-                </div>
-                <div id="profile">
-
-                </div>
-            </div>
             <div id="clear">
                 <input id="Reset" multiple type="reset", value="クリア">
+            </div>
+            <div class="output">
+                <div class="left-column">
+                    <div id="status"></div>
+                </div>
+                <div class="right-column">
+                    <div id="profile"></div>
+                </div>
             </div>
         </form>
     </body>
