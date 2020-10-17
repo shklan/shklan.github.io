@@ -7,16 +7,24 @@
             TRPG character sheet checker
         </title>
         <style>
+            .introduction {display: block; padding-bottom: 25px; margin: auto;}
             form {width: 100%; padding: 5px; }
-            .output {width: 1080px; display: flex; margin: 0 auto; padding: 0;}
+            .checkzone {width: 1180px; display: flex; margin: 0 auto; padding: 0;}
+            .output {width: 860px; display: flex; margin: 0 auto; padding: 0;}
+            .settings {width: 320px; display: block; margin: 0 auto; padding: 0;}
             #dropzone {min-height: 60px; background-color: #eee;}
-            #status {display: block; width: 540px;}
-            #profile {display: block; width: 540px;}
+            #status {display: block; width: 430px;}
+            #profile {display: block; width: 430px;}
             
         </style>
     </head>
     
     <body>
+        <div class="introduction">
+        簡易的なキャラクターシートチェッカーです．<br>
+        キャラクターシートを読み込ませることで，技能値のチェックが出来ます．<br>
+        赤い表示の技能値は技能値が制約を超えていることを表します．<br>
+        </div>
         <form>
             <div id="dropzone", effectAllowed="move">
                 <input id="fileInput" multiple type="file">
@@ -25,6 +33,7 @@
                 <input id="Reset" multiple type="reset", value="クリア">
             </div> 
         </form>
+        <div class="checkzone">
         <div class="output">
             <div class="left-column">
                 <div id="status"></div>
@@ -34,6 +43,9 @@
             </div>
         </div>
         <div class="settings">
+            <b>設定</b> <br><br>
+            そのうち生えるよ
+        </div>
         </div>
     </body>
 

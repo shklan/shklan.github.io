@@ -10,15 +10,14 @@ window.onload = function () {
 };
 
 function validate_input() {
-    const files = document.getElementById("fileInput").files;
-    _validate(files);
+    _validate();
 }
 
 function validate_drop(dropfiles) {
     dropfiles.preventDefault();
     const files = dropfiles.dataTransfer.files;
     document.getElementById("fileInput").files = files;
-    _validate(files);
+    _validate();
     dropfiles.dataTransfer.files = null;
 }
 
@@ -28,8 +27,9 @@ function clear() {
     document.getElementById("profile").innerHTML = "";
 }
 
-async function _validate(files) {
+async function _validate() {
     console.log("validation start");
+    files = document.getElementById("fileInput").files;
     const files_len = files.length;
     const status_output = document.getElementById("status");
     const profile_output = document.getElementById("profile");
@@ -57,8 +57,6 @@ function _printProfile(output, data) {
     const keys = Object.keys(data);
     for (let i=0, l=keys.length; i<l; i++) {
         value = data[keys[i]];
-        console.log(value.length)
-        console.log(value)
         if (value == "" | value == "\r") {
             output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
         } else {
