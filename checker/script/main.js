@@ -7,7 +7,19 @@ window.onload = function () {
         event.preventDefault();
     };
     document.getElementById("Reset").onclick = clear;
+    document.getElementById("allvalue_setter").onchange = revalidate;
 };
+
+function revalidate() {
+    clearOutput();
+    const threshold = document.getElementById("allvalue_setter").value;
+    if (threshold < 0) {
+        document.getElementById("allvalue_setter").value = 0;
+    } else if (threshold > 99) {
+        document.getElementById("allvalue_setter").value = 99;
+    }
+    _validate();
+}
 
 function validate_input() {
     _validate();
@@ -23,6 +35,10 @@ function validate_drop(dropfiles) {
 
 function clear() {
     document.getElementById("fileInput").files = null;
+    clearOutput();
+}
+
+function clearOutput() {
     document.getElementById("status").innerHTML = "";
     document.getElementById("profile").innerHTML = "";
 }
@@ -33,19 +49,20 @@ async function _validate() {
     const files_len = files.length;
     const status_output = document.getElementById("status");
     const profile_output = document.getElementById("profile");
+    const threshold = document.getElementById("allvalue_setter").value;
     for (let i=0; i<files_len; i++) {
         const file = files[i];
         const file_data = await _extractData(file);
-        _printStatus(status_output, file_data["status"]);
+        _printStatus(status_output, file_data["status"], threshold);
         _printProfile(profile_output, file_data["profile"]);
     }
 }
 
-function _printStatus(output, data) {
+function _printStatus(output, data, threshold) {
     const keys = Object.keys(data);
     for (let i=0, l=keys.length; i<l; i++) {
         value = data[keys[i]];
-        if (parseInt(value.split("％")[0], 10) > 75) {
+        if (parseInt(value.split("％")[0], 10) > threshold) {
             output.innerHTML += '<font color = "red">' + keys[i] + ": " + value + "</font><br>";
         } else {
             output.innerHTML += keys[i] + ": " + value + "<br>";
