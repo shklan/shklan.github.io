@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <script src="./script/main.js", defer="defer"></script>
+        <script src="./script/status.js", defer="defer"></script>
         <title>
             TRPG character sheet checker
         </title>
@@ -16,6 +17,7 @@
             #status {display: block; width: 430px;}
             #profile {display: block; width: 430px;}
             input {min-width: 180px;}
+            select {min-width: 180px;}
         </style>
     </head>
     
@@ -44,8 +46,24 @@
         </div>
         <div class="settings">
             <b>設定</b> <br><br>
+            <div id="all">
             能力値上限一括変更<br>
             <input id="allvalue_setter" value="75" min="1" max="99" step="1">
+            </div>
+            <br>
+            <button id="allbutton">適用</button>
+            <br>
+            <form>
+                <div id="custom">
+                能力値別変更<br>
+                <select id="custom_selector" disabled></select>
+                <br>
+                <input id="customvalue_setter" value="75" min="1" max="99" step="1">
+                </div>
+                <br>
+            </form>
+            <button id="custombutton">適用</button>
+            <div id="customsettings_output"></div>
         </div>
         </div>
     </body>
