@@ -44,7 +44,7 @@ function _print(data) {
         const text = tokens[i].split(/\s|<span>|<\/span>/).filter(text => text.length).join(" ");
         const ltag = tokens[i-1]
         const rtag = tokens[i+1]
-        content += ltag+text+rtag+"<br>\n";
+        content += ltag+text+rtag+"\n";
     }
     return new Blob([content], {"type": "text/plain"})
 }
