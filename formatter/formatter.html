@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="./script/main.js", defer="defer"></script>
+        <title>
+            TRPG log formatter
+        </title>
+        <style>
+            .introduction {display: block; padding-bottom: 25px; margin: auto;}
+            form {width: 100%; padding: 5px; }
+            .output {width: 100%; padding: 5px; }
+            #dropzone {min-height: 60px; width: 1180px; background-color: #eee;}
+            #Reset {min-width: 180px;}
+            #html {height: 150px; width: 1180px;}
+        </style>
+    </head>
+    
+    <body>
+        <div class="introduction">
+        <br>
+        </div>
+        <form>
+            <div id="dropzone", effectAllowed="move">
+                <input id="fileInput" multiple type="file">
+            </div>
+            <div id="clear">
+                <input id="Reset" multiple type="reset", value="クリア">
+            </div> 
+        </form>
+        <div class="output">
+            <output id="html">
+        </div>
+    </body>
+</html>
