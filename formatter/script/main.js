@@ -1,35 +1,36 @@
 `use strict`;
 
 window.onload = function () {
-    document.getElementById("fileInput").onchange = format_input;
-    document.getElementById("dropzone").ondrop = format_drop;
-    document.getElementById("dropzone").ondragover = function (event) {
+    for(let i=0, max=2;i<max;i++) {
+        document.getElementsByClassName("fileInput")[i].onchange = format_input;
+        document.getElementsByClassName("dropzone")[i].ondrop = format_drop;
+        document.getElementsByClassName("dropzone")[i].ondragover = function (event) {
         event.preventDefault();
-    };
-    document.getElementById("Reset").onclick = clear;
+        };
+    }
 };
 
-async function format_input() {
-    await _format();
+async function format_input(files) {
+    await _format(files.target);
 }
 
-async function format_drop() {
+async function format_drop(dropfiles) {
     dropfiles.preventDefault();
+    const target = dropfiles.target.children[0];
     const files = dropfiles.dataTransfer.files;
-    document.getElementById("fileInput").files = files;
-    await _format();
+    target.files = files;
+    await _format(target);
     dropfiles.dataTransfer.files = null;
 }
 
-async function _format() {
+async function _format(target) {
     console.log("formatting start");
-    files = document.getElementById("fileInput").files;
+    files = target.files;
     const files_len = files.length;
-    const output = document.getElementById("html");
     for (let i=0; i<files_len; i++) {
         const file = files[i];
         const file_data = await _read(file);
-        const blob = _print(file_data);
+        const blob = _print(target.id, file_data);
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "output.txt";
@@ -37,7 +38,38 @@ async function _format() {
     }    
 }
 
-function _print(data) {
+function _print(id, data) {
+    let formatted_blob;
+    switch (id) {
+        case "ccfolia":
+            formatted_blob = _printCcfolia(data);
+            break;
+        case "dodontof":
+            formatted_blob = _printDodontof(data);
+            break;    
+    }
+    return formatted_blob;
+}
+
+function _printDodontof(data) {
+    const tokens = data.split(/<br>\n(?!Cthulhu)/);
+    let content = "";
+    content += _formatDodontofToken(tokens[0].split("<body>\n")[1]);
+    for (let i=1, l=tokens.length; i<l-1; i++) {
+        content += _formatDodontofToken(tokens[i]);
+    }
+    return new Blob([content], {"type": "text/plain"});
+}
+
+function _formatDodontofToken(token) {
+    const tag = [...token.matchAll(/<font color='.+'>|<\/font>/g)]
+    const ltag = tag[0].join("").replace("font", "p");
+    const rtag = tag[1].join("").replace("font", "p");
+    const content = token.split(/<font color='.+'>|<\/font>/).join("");
+    return ltag+content+rtag+"\n";
+}
+
+function _printCcfolia(data) {
     const tokens = data.split(/(<p .*>|<\/p>)/);
     let content = "";
     for(let i=2, l=tokens.length; i<l; i+=4) {
@@ -46,7 +78,7 @@ function _print(data) {
         const rtag = tokens[i+1]
         content += ltag+text+rtag+"\n";
     }
-    return new Blob([content], {"type": "text/plain"})
+    return new Blob([content], {"type": "text/plain"});
 }
 
 function _read(file) {
@@ -55,5 +87,5 @@ function _read(file) {
     return new Promise ((resolve, reject) => {
         reader.onload = () => resolve(reader.result);
         reader.onerror = (e) => reject(e);
-    })
+    });
 }

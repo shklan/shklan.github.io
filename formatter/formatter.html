@@ -7,25 +7,39 @@
             TRPG log formatter
         </title>
         <style>
+            body {padding:2em}
+            .title {text-align: center; font-size: xx-large; font-weight: bold;}
+            .text {padding-left: 1em; font-size: x-large; color: #476499;}
             .introduction {display: block; padding-bottom: 25px; margin: auto;}
-            form {width: 100%; padding: 5px; }
+            form {width: 100%; padding-left: 2em; }
             .output {width: 100%; padding: 5px; }
-            #dropzone {min-height: 60px; width: 1180px; background-color: #eee;}
-            #Reset {min-width: 180px;}
+            .dropzone {min-height: 60px; width: 1180px; background-color: #eee;}
+            .reset {min-width: 180px;}
             #html {height: 150px; width: 1180px;}
         </style>
     </head>
     
     <body>
+        <p class="title">Formatter</p>
         <div class="introduction">
         <br>
         </div>
+        <p class="text">For ココフォリア</p>
         <form>
-            <div id="dropzone", effectAllowed="move">
-                <input id="fileInput" multiple type="file">
+            <div class="dropzone" effectAllowed="move">
+                <input class="fileInput" id="ccfolia" multiple type="file">
             </div>
-            <div id="clear">
-                <input id="Reset" multiple type="reset", value="クリア">
+            <div class="clear">
+                <input class="reset" multiple type="reset"  value="クリア">
+            </div> 
+        </form>
+        <p class="text">For どどんとふ</p>
+        <form>
+            <div class="dropzone" effectAllowed="move">
+                <input class="fileInput" id="dodontof" multiple type="file">
+            </div>
+            <div class="clear">
+                <input class="reset" multiple type="reset" value="クリア">
             </div> 
         </form>
         <div class="output">
