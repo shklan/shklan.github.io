@@ -62,8 +62,8 @@ function _printDodontof(data) {
 }
 
 function _formatDodontofToken(token) {
-    const tag = [...token.matchAll(/<font color='.+'>|<\/font>/g)]
-    const ltag = tag[0].join("").replace("font", "p");
+    const tag = [...token.matchAll(/(?<=<font color=').+(?='>)|<\/font>/g)]
+    const ltag = '<p style="color:'+tag[0].join("")+';">';
     const rtag = tag[1].join("").replace("font", "p");
     const content = token.split(/<font color='.+'>|<\/font>/).join("");
     return ltag+content+rtag+"\n";
