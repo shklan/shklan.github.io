@@ -4,66 +4,56 @@
         <meta charset="utf-8">
         <script src="./script/index.js", type="text/javascript"></script>
         <title>
-            TRPG character sheet checker
+            TRPG battle simulator
         </title>
         <style>
-            .introduction {display: block; padding-bottom: 25px; margin: auto;}
-            form {width: 100%; padding: 5px; }
-            .checkzone {width: 1180px; display: flex; margin: 0 auto; padding: 0;}
-            .output {width: 860px; display: flex; margin: 0 auto; padding: 0;}
-            .settings {width: 320px; display: block; margin: 0 auto; padding: 0;}
+            .introduction {display: block; padding-bottom: 25px; padding-top: 30px; margin: auto;}
+            .text-centering {text-align: center;}
+            .stage {width: 90vw; display: flex; margin: 0 auto; padding: 0;}
+            .actor-root {padding: 5px; display: block;}
+            .actor {border: 1px solid #1f1e33; border-radius: 4px; display: block; padding-left: 5px;}
+            .actors {width: 40vw; display: block; margin: 0 auto; padding: 0;}
+            .friends {background-color: #b9ffd1;}
+            .enemies {background-color: #ffdfdf;}
+            .status {width: 100%; overflow: auto;}
+            .status-table {width: 90%;}
+            .status-input {width: 40px; overflow: hidden;}
             #dropzone {min-height: 60px; width: 1180px; background-color: #eee;}
             #status {display: block; width: 430px;}
             #profile {display: block; width: 430px;}
-            input {min-width: 180px;}
-            select {min-width: 180px;}
+            form {width: 100%; padding: 5px; }
+            /* input {min-width: 180px;} */
+            /* select {min-width: 180px;} */
         </style>
     </head>
     
     <body>
-        <div class="introduction">
-        簡易的なキャラクターシートチェッカーです．<br>
-        キャラクターシートを読み込ませることで，技能値のチェックが出来ます．<br>
-        赤い表示の技能値は技能値が制約を超えていることを表します．<br>
+        <div class="introduction text-centering">
+        CoC戦闘シミュレーターです．<br>
+        <!-- キャラクターシートを読み込ませることで，技能値のチェックが出来ます．<br>
+        赤い表示の技能値は技能値が制約を超えていることを表します．<br> -->
         </div>
-        <form>
+        <!-- <form>
             <div id="dropzone", effectAllowed="move">
                 <input id="fileInput" multiple type="file">
             </div>
             <div id="clear">
                 <input id="Reset" multiple type="reset", value="クリア">
             </div> 
-        </form>
-        <div class="checkzone">
-        <div class="output">
-            <div class="left-column">
-                <div id="status"></div>
-            </div>
-            <div class="right-column">
-                <div id="profile"></div>
-            </div>
-        </div>
-        <div class="settings">
-            <b>設定</b> <br><br>
-            <div id="all">
-            能力値上限一括変更<br>
-            <input id="allvalue_setter" value="75" min="1" max="99" step="1">
-            </div>
-            <br>
-            <button id="allbutton">適用</button>
-            <br>
-            <form>
-                <div id="custom">
-                能力値別変更<br>
-                <select id="custom_selector" disabled></select>
-                <br>
-                <input id="customvalue_setter" value="75" min="1" max="99" step="1">
+        </form> -->
+        <div class="stage">
+            <div class="actors friends">
+                <div class="operation">
+                    <button class="add-actor">追加</button>
                 </div>
-                <br>
-            </form>
-            <button id="custombutton">適用</button>
-            <div id="customsettings_output"></div>
-        </div>
+                <!-- 味方だよ -->
+                <div id="friend-list">一覧だよ</div>
+            </div>
+            <div class="actors enemies">
+                <div class="operation"></div>
+                <!-- 敵だよ -->
+                <div id="enemy-list">一覧だよ</div>
+            </div>
         </div>
     </body>
 

@@ -1,5 +1,6 @@
 export default class Status {
     private _state: Map<string, number>;
+    private _san: number;
     private _db: string;
 
     constructor() {
@@ -9,20 +10,34 @@ export default class Status {
         this._state.set("STR", 0);
         this._state.set("CON", 0);
         this._state.set("POW", 0);
-        this._state.set("DEx", 0);
+        this._state.set("DEX", 0);
         this._state.set("APP", 0);
         this._state.set("SIZ", 0);
         this._state.set("INT", 0);
         this._state.set("EDU", 0);
+        this._san = 0;
         this._db = "0";
     }
 
     public setStatus(name: string, val: number): void {
         if (this._state.has(name)) this._state.set(name, val);
-        this._setDb();
+        this._setDefaultSan();
+        this._setDefaultDb();
     }
 
-    private _setDb(): void {
+    public getKeys(): IterableIterator<string> {
+        return this._state.keys();
+    }
+
+    public getStatus(name: string): number {
+        return this._state.get(name)!;
+    }
+
+    private _setDefaultSan(): void {
+        this._san = this._state.get("POW")! * 5;
+    }
+
+    private _setDefaultDb(): void {
         const str: number = this._state.get("STR")!;
         const siz: number = this._state.get("SIZ")!;
         const base: number = str + siz - 16;
@@ -36,4 +51,5 @@ export default class Status {
             this._db = dice + "d6";
         }
     }
+
 }
