@@ -155,20 +155,33 @@ function execCopy() {
 function _copyData(event) {
     event.preventDefault();
     let string = "";
-    let data = FILE_DATA["status"];
-    const status_keys = Object.keys(data);
+    // status
+    const status_data = FILE_DATA["status"];
+    const status_keys = Object.keys(status_data);
     for (let i=0, l=status_keys.length; i<l; i++) {
         const key = status_keys[i];
-        const value = data[key].slice(0, -1);
+        const value = status_data[key].slice(0, -1);
         string += "ccb<=" + value + " " + key + "\n";
     }
-    // const parameter_keys = ["{STR}", "{CON}", "{POW}", "{DEX}", "{APP}", "{SIZ}", "{INT}", "EDU"];
-    // for (let i=0, l=parameter_keys.length; i<l; i++) {
-    //     const key = parameter_keys[i];
-    //     string += "ccb<=" + key
-    // }
+    // parameter original
+    const parameter_original = FILE_DATA["parameter"]["original"];
+    const original_keys = Object.keys(parameter_original);
+    for (let i=0, l=original_keys.length; i<l; i++) {
+        const key = original_keys[i];
+        const value = parameter_original[key];
+        for (let level = 1; level <= 5; level++) {
+            string += "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
+        }        
+    }
+    // parameter ability
+    const parameter_ability = FILE_DATA["parameter"]["ability"];
+    const ability_keys = Object.keys(parameter_ability);
+    for (let i=0, l=ability_keys.length; i<l; i++) {
+        const key = ability_keys[i];
+        const value = parameter_ability[key];
+        string += "ccb<=" + value + " " + "《" + key + "》" + "\n";
+    }
     string += "ccb<={SAN} 《SANチェック》\n";
-    console.log(string);
     event.clipboardData.setData("text/plain", string);
 }
 
@@ -177,8 +190,7 @@ async function _extractData(file) {
     let text = await _read(file);
     data["profile"] = _extractProfile(text);
     data["status"] = _extractStatus(text);
-    data["skills"] = _extractSkills(text);
-
+    data["parameter"] = _extractParameters(text);
     return data;
 }
 
@@ -208,12 +220,12 @@ function _extractProfile(text) {
 
 function _extractStatus(text) {
     let data = {};
-    let tokens = text.split("■技能■")[1].split(/\n|\s|　/)
+    let tokens = text.split("■技能■")[1].split(/\n|\s|　/);
     for(let i=0, l=tokens.length; i<l; i++) {
         if (tokens[i] == "■戦闘■") {
             break;
         }
-        const text = tokens[i]
+        const text = tokens[i];
         switch(text[0]) {
             case "《": 
                 const num_a = text.split("》")[1];
@@ -238,8 +250,30 @@ function _extractStatus(text) {
     return data;
 }
 
-function _extractSkills(text) {
-    let data = {};
+function _extractParameters(text) {
+    let data = {"original": {}, "ability": {}};
+    let tokens = text.split("■簡易用■")[1].split(/\r*\n|　/);
+    for(let i=0, l=tokens.length; i<l; i++) {
+        const text = tokens[i];
+        if (text[0] == "-") break;
+        const splitted = text.split(":");
+        const key = splitted[0];
+        const value = splitted[1];
+        switch(key) {
+            case "STR": case "DEX": case "INT": case "CON": case "APP": case "POW": case "SIZ": case "EDU":
+                data["original"][key] = value;
+                break;
+            case "ｱｲﾃﾞｱ":
+                data["ability"]["アイデア"] = value;
+                break;
+            case "幸 運":
+                data["ability"]["幸運"] = value;
+                break;
+            case "知 識":
+                data["ability"]["知識"] = value;
+                break;
+        }
+    }
     return data;
 }
 
