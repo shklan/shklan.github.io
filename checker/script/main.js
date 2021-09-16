@@ -1,4 +1,5 @@
 `use strict`;
+let FILE_DATA = null;
 
 window.onload = function () {
     document.getElementById("fileInput").onchange = validate_input;
@@ -71,10 +72,12 @@ function _deleteCustomSelector() {
 
 function clear() {
     document.getElementById("fileInput").files = null;
+    FILE_DATA = null;
     _clearDataOutput();
     _clearCustomOutput();
     _deleteThreshold();
     _deleteCustomSelector();
+    _disableChatPaletteCopyButton();
 }
 
 function _clearDataOutput() {
@@ -86,21 +89,30 @@ function _clearCustomOutput() {
     document.getElementById("customsettings_output").innerHTML = "";
 }
 
+function _disableChatPaletteCopyButton() {
+    const chatPalettCopyButton = document.getElementById("chatpallet");
+    chatPalettCopyButton.removeEventListener("click", execCopy);
+    chatPalettCopyButton.disabled = true;
+}
+
 async function _validate() {
+    const err = new Error();
     console.log("validation start");
     files = document.getElementById("fileInput").files;
     const files_len = files.length;
     const status_output = document.getElementById("status");
     const profile_output = document.getElementById("profile");
-    for (let i=0; i<files_len; i++) {
-        const file = files[i];
-        const file_data = await _extractData(file);
-        _setThreshold(file_data["status"]);
-        const statusThreshold = _getThreshold();
-
-        _printStatus(status_output, file_data["status"], statusThreshold);
-        _printProfile(profile_output, file_data["profile"]);
+    if (files_len != 1) {
+        throw err;
     }
+    const file = files[0];
+    FILE_DATA = await _extractData(file);
+    _setThreshold(FILE_DATA["status"]);
+    const statusThreshold = _getThreshold();
+
+    _printStatus(status_output, FILE_DATA["status"], statusThreshold);
+    _printProfile(profile_output, FILE_DATA["profile"]);
+    _enableChatPaletteCopyButton()
 }
 
 function _printStatus(output, data, statusThreshold) {
@@ -119,7 +131,7 @@ function _printStatus(output, data, statusThreshold) {
 function _printProfile(output, data) {
     const keys = Object.keys(data);
     for (let i=0, l=keys.length; i<l; i++) {
-        value = data[keys[i]];
+        const value = data[keys[i]];
         if (value == "" | value == "\r") {
             output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
         } else {
@@ -128,12 +140,45 @@ function _printProfile(output, data) {
     }
 }
 
+function _enableChatPaletteCopyButton() {
+    const chatPalettCopyButton = document.getElementById("chatpallet");
+    chatPalettCopyButton.addEventListener("click", execCopy);
+    chatPalettCopyButton.disabled = false;
+}
+
+function execCopy() {
+    document.addEventListener("copy", _copyData);
+    document.execCommand("copy");
+    document.removeEventListener("copy", _copyData);
+}
+
+function _copyData(event) {
+    event.preventDefault();
+    let string = "";
+    let data = FILE_DATA["status"];
+    const status_keys = Object.keys(data);
+    for (let i=0, l=status_keys.length; i<l; i++) {
+        const key = status_keys[i];
+        const value = data[key].slice(0, -1);
+        string += "ccb<=" + value + " " + key + "\n";
+    }
+    // const parameter_keys = ["{STR}", "{CON}", "{POW}", "{DEX}", "{APP}", "{SIZ}", "{INT}", "EDU"];
+    // for (let i=0, l=parameter_keys.length; i<l; i++) {
+    //     const key = parameter_keys[i];
+    //     string += "ccb<=" + key
+    // }
+    string += "ccb<={SAN} 《SANチェック》\n";
+    console.log(string);
+    event.clipboardData.setData("text/plain", string);
+}
+
 async function _extractData(file) {
     let data = {};
     let text = await _read(file);
     data["profile"] = _extractProfile(text);
     data["status"] = _extractStatus(text);
     data["skills"] = _extractSkills(text);
+
     return data;
 }
 
