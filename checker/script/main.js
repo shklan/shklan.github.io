@@ -115,15 +115,19 @@ async function _validate() {
     _enableChatPaletteCopyButton()
 }
 
-function _printStatus(output, data, statusThreshold) {
-    const keys = Object.keys(data);
-    for (let i=0, l=keys.length; i<l; i++) {
-        let thr = statusThreshold[keys[i]];
-        let value = data[keys[i]];
-        if (parseInt(value.split("％")[0], 10) > thr) {
-            output.innerHTML += '<font color = "red">' + keys[i] + ": " + value + "</font><br>";
-        } else {
-            output.innerHTML += keys[i] + ": " + value + "<br>";
+function _printStatus(output, all_data, statusThreshold) {
+    const all_keys = Object.keys(all_data);
+    for (let all_i=0, all_l=all_keys.length; all_i<all_l; all_i++) {
+        const data = all_data[all_keys[all_i]];
+        const keys = Object.keys(data);
+        for (let i=0, l=keys.length; i<l; i++) {
+            let thr = statusThreshold[keys[i]];
+            let value = data[keys[i]];
+            if (parseInt(value.split("％")[0], 10) > thr) {
+                output.innerHTML += '<font color = "red">' + keys[i] + ": " + value + "</font><br>";
+            } else {
+                output.innerHTML += keys[i] + ": " + value + "<br>";
+            }
         }
     }
 }
@@ -157,19 +161,24 @@ function _copyData(event) {
     let string = "";
     const secret = document.getElementById("secret").checked ? "s" : "";
     // status
-    const status_data = FILE_DATA["status"];
-    const status_keys = Object.keys(status_data);
-    for (let i=0, l=status_keys.length; i<l; i++) {
-        const key = status_keys[i];
-        const value = status_data[key].slice(0, -1);
-        string += secret + "ccb<=" + value + " " + key + "\n";
+    const all_status = FILE_DATA["status"];
+    for (let all_key in all_status) {
+        const status_data = all_status[all_key];
+        const status_keys = Object.keys(status_data);
+        for (let i=0, l=status_keys.length; i<l; i++) {
+            const key = status_keys[i];
+            const value = status_data[key].slice(0, -1);
+            string += secret + "ccb<="+ value + " " + key + "\n";
+        }
     }
+    
     // parameter original
     const parameter_original = FILE_DATA["parameter"]["original"];
     const original_keys = Object.keys(parameter_original);
     for (let i=0, l=original_keys.length; i<l; i++) {
         const key = original_keys[i];
         const value = parameter_original[key];
+        if(key == "DB") continue;
         for (let level = 1; level <= 5; level++) {
             string += secret + "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
         }        
@@ -183,6 +192,7 @@ function _copyData(event) {
         string += secret + "ccb<=" + value + " " + "《" + key + "》" + "\n";
     }
     string += secret + "ccb<={SAN} 《SANチェック》\n";
+    console.log(string);
     event.clipboardData.setData("text/plain", string);
 }
 
@@ -220,7 +230,12 @@ function _extractProfile(text) {
 }
 
 function _extractStatus(text) {
-    let data = {};
+    let battle_data = {};
+    let search_data = {};
+    let action_data = {};
+    let negotiation_data = {};
+    let knowledge_data = {};
+    let data;
     let tokens = text.split("■技能■")[1].split(/\n|\s|　/);
     for(let i=0, l=tokens.length; i<l; i++) {
         if (tokens[i] == "■戦闘■") {
@@ -228,27 +243,44 @@ function _extractStatus(text) {
         }
         const text = tokens[i];
         switch(text[0]) {
+            case "戦":
+                data = battle_data;
+                break;
+            case "探":
+                data = search_data;
+                break;
+            case "行":
+                data = action_data;
+                break;
+            case "交":
+                data = negotiation_data;
+                break;
+            case "知":
+                data = knowledge_data;
+                break;
             case "《": 
                 const num_a = text.split("》")[1];
                 if (num_a.length == 0) {
-                    data[tokens[i]]=_nextNum(i+1, tokens);
+                    const next = _nextNum(i+1, tokens);
+                    if(next.length > 1) data[text]=next;
                 } else {
                     key = text.slice(0, text.indexOf(num_a));
-                    data[key]=num_a; 
+                    if(num_a.length > 1) data[key]=num_a;
                 }
                 break;
             case "●":
                 const num_b = text.split("》")[1];
                 if (num_b.length == 0) {
-                    data[tokens[i].slice(1)]=_nextNum(i+1, tokens);
+                    const next = _nextNum(i+1, tokens)
+                    if(next.length > 1) data[text.slice(1)]=next;
                 } else {
                     key = text.slice(1, text.indexOf(num_b));
-                    data[key]=num_b; 
+                    if(num_b.length > 1) data[key]=num_b; 
                 }
                 break;
         }
     }
-    return data;
+    return {"battle": battle_data, "search": search_data, "action": action_data, "negotiation": negotiation_data, "knowledge": knowledge_data};
 }
 
 function _extractParameters(text) {
@@ -263,6 +295,9 @@ function _extractParameters(text) {
         switch(key) {
             case "STR": case "DEX": case "INT": case "CON": case "APP": case "POW": case "SIZ": case "EDU":
                 data["original"][key] = value;
+                break;
+            case "ﾀﾞﾒｰｼﾞﾎﾞｰﾅｽ":
+                data["original"]["DB"] = value;
                 break;
             case "ｱｲﾃﾞｱ":
                 data["ability"]["アイデア"] = value;

@@ -2,7 +2,9 @@
 
 function _setThreshold(status) {
     if (Object.keys(_statusThresholds).length == 0) {
-        _initThreshold(status);
+        for (let value of Object.values(status)) {
+            _initThreshold(value);
+        }
     }
 }
 
