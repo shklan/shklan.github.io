@@ -16,7 +16,6 @@
             #dropzone {min-height: 60px; width: 1180px; background-color: #eee;}
             #status {display: block; width: 430px;}
             #profile {display: block; width: 430px;}
-            input {min-width: 180px;}
             select {min-width: 180px;}
         </style>
     </head>
@@ -41,7 +40,13 @@
                 <div id="status"></div>
             </div>
             <div class="right-column">
-                <button id="chatpallet" disabled="">コピー（チャットパレット）</button>
+                <div>
+                    <button id="copy" disabled="">コピー（チャットパレット）</button>
+                </div>
+                <div>
+                    <label for="secret">シークレット</label>
+                    <input type="checkbox" id="secret">
+                </div>
                 <div id="profile"></div>
             </div>
         </div>

@@ -90,7 +90,7 @@ function _clearCustomOutput() {
 }
 
 function _disableChatPaletteCopyButton() {
-    const chatPalettCopyButton = document.getElementById("chatpallet");
+    const chatPalettCopyButton = document.getElementById("copy");
     chatPalettCopyButton.removeEventListener("click", execCopy);
     chatPalettCopyButton.disabled = true;
 }
@@ -141,7 +141,7 @@ function _printProfile(output, data) {
 }
 
 function _enableChatPaletteCopyButton() {
-    const chatPalettCopyButton = document.getElementById("chatpallet");
+    const chatPalettCopyButton = document.getElementById("copy");
     chatPalettCopyButton.addEventListener("click", execCopy);
     chatPalettCopyButton.disabled = false;
 }
@@ -155,13 +155,14 @@ function execCopy() {
 function _copyData(event) {
     event.preventDefault();
     let string = "";
+    const secret = document.getElementById("secret").checked ? "s" : "";
     // status
     const status_data = FILE_DATA["status"];
     const status_keys = Object.keys(status_data);
     for (let i=0, l=status_keys.length; i<l; i++) {
         const key = status_keys[i];
         const value = status_data[key].slice(0, -1);
-        string += "ccb<=" + value + " " + key + "\n";
+        string += secret + "ccb<=" + value + " " + key + "\n";
     }
     // parameter original
     const parameter_original = FILE_DATA["parameter"]["original"];
@@ -170,7 +171,7 @@ function _copyData(event) {
         const key = original_keys[i];
         const value = parameter_original[key];
         for (let level = 1; level <= 5; level++) {
-            string += "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
+            string += secret + "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
         }        
     }
     // parameter ability
@@ -179,9 +180,9 @@ function _copyData(event) {
     for (let i=0, l=ability_keys.length; i<l; i++) {
         const key = ability_keys[i];
         const value = parameter_ability[key];
-        string += "ccb<=" + value + " " + "《" + key + "》" + "\n";
+        string += secret + "ccb<=" + value + " " + "《" + key + "》" + "\n";
     }
-    string += "ccb<={SAN} 《SANチェック》\n";
+    string += secret + "ccb<={SAN} 《SANチェック》\n";
     event.clipboardData.setData("text/plain", string);
 }
 
