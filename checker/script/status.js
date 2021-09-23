@@ -1,5 +1,12 @@
 `use strict`;
 
+const DAMAGE = {
+    "《こぶし（パンチ）》": "d3",
+    "《頭突き》": "d4",
+    "《キック》": "d6",
+    "《組み付き》": "d6",
+}
+
 function _setThreshold(status) {
     if (Object.keys(_statusThresholds).length == 0) {
         for (let value of Object.values(status)) {
