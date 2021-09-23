@@ -191,6 +191,9 @@ function _copyData(event) {
                         string += secret + "2d3" + " " + "《医学》＋" + key + "回復" + "\n";
                     }
                     break;
+                case "《精神分析》":
+                    string += secret + "1d3"+ " " + key + "回復" + "\n";
+                    break;
                 default:
                     break;
             }
