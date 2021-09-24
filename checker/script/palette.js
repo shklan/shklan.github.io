@@ -79,6 +79,7 @@ function _createCommand() {
     const secret = document.getElementById("secret").checked ? "s" : "";
     command += _createParameterCommand(FILE_DATA.parameter, secret);
     command += _createAbilityCommand(FILE_DATA.ability, secret);
+    command += _createDefaultCommand(FILE_DATA.parameter, secret);
     command += secret + "ccb<={SAN} 《SANチェック》\n";
     return command;
 }
@@ -160,6 +161,20 @@ function _createAbilityCommand(ability, secret) {
 
         command += secret + "ccb<=" + thr + " " + name + "\n";
     }
+    return command;
+}
+
+function _createDefaultCommand(parameter, secret) {
+    let command = "";
+    // アイデア
+    const idea = Math.min(parameter["INT"]*5, 99);
+    command += secret + "ccb<=" + idea + " " +  _decorateKey("アイデア") + "\n";
+    // 幸運
+    const fortune = Math.min(parameter["POW"]*5, 99);
+    command += secret + "ccb<=" + fortune + " " +  _decorateKey("幸運") + "\n";
+    // 知識
+    const knowledge = Math.min(parameter["EDU"]*5, 99);
+    command += secret + "ccb<=" + knowledge + " " +  _decorateKey("知識") + "\n";
     return command;
 }
 
