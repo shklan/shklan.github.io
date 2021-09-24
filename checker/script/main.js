@@ -7,6 +7,7 @@ window.onload = function () {
         event.preventDefault();
     };
     document.getElementById("Reset").onclick = clear;
+    document.getElementById("warning").onchange = presetValue;
 };
 
 function _createCustomSetter() {
@@ -33,6 +34,7 @@ function _deleteCustomSelector() {
 function clear() {
     document.getElementById("fileInput").files = null;
     FILE_DATA = null;
+    PRESET = null;
     _clearDataOutput();
     _clearCustomOutput();
     _deleteThreshold();
@@ -42,7 +44,7 @@ function clear() {
 
 function _clearDataOutput() {
     document.getElementById("status").innerHTML = "";
-    document.getElementById("profile").innerHTML = "";
+    document.getElementById("warning").innerHTML = "";
 }
 
 function _clearCustomOutput() {

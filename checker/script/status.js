@@ -1,13 +1,18 @@
 `use strict`;
 
-let FILE_DATA = null;
-
 const DAMAGE = {
     "《こぶし（パンチ）》": "d3",
     "《頭突き》": "d4",
     "《キック》": "d6",
     "《組み付き》": "d6",
 }
+
+const RECOVER = {
+    "《応急手当》": "d3",
+    "《精神分析》": "d3",
+}
+
+let STATUS_THRESHOLDS = {};
 
 function setAllAndRevalidate() {
     const value = document.getElementById("allvalue_setter").value;
@@ -29,21 +34,19 @@ function _printCustomSettings(key, value) {
     output.innerHTML += key + "の上限: " + value + "%<br>";
 }
 
-function _setThreshold(status) {
-    if (Object.keys(_statusThresholds).length == 0) {
-        for (let value of Object.values(status)) {
-            _initThreshold(value);
-        }
-    }
-}
-
-function _initThreshold(status) {
-    const keys = Object.keys(status);
-    for (let i=0, l=keys.length; i<l; i++) {
-        _statusThresholds[keys[i]] = -1;
-    }
+function _setThreshold(ability) {
+    _initThreshold(ability);
     const value = document.getElementById("allvalue_setter").value;
     _setAllThreshold(value);
+}
+
+function _initThreshold(ability) {
+    for (let type in ability) {
+        const status = ability[type];
+        for (let key in status) {
+            STATUS_THRESHOLDS[key] = -1;
+        }
+    }    
 }
 
 function _setAllThreshold(value) {
@@ -52,27 +55,25 @@ function _setAllThreshold(value) {
     } else if (value > 99) {
         value = document.getElementById("allvalue_setter").value = 99;
     }
-    const keys = Object.keys(_statusThresholds);
+    const keys = Object.keys(STATUS_THRESHOLDS);
     for (let i=0, l=keys.length; i<l; i++) {
-        _statusThresholds[keys[i]] = value;
+        STATUS_THRESHOLDS[keys[i]] = value;
     }
 }
 
 function _setCustomThreshold(key, value) {
     console.log(key);
     console.log(value);
-    _statusThresholds[key] = value;
+    STATUS_THRESHOLDS[key] = value;
 }
 
 function _deleteThreshold() {
-    const keys = Object.keys(_statusThresholds);
+    const keys = Object.keys(STATUS_THRESHOLDS);
     for (let i=0, l=keys.length; i<l; i++) {
-        delete _statusThresholds[keys[i]];
+        delete STATUS_THRESHOLDS[keys[i]];
     }
 }
 
 function _getThreshold() {
-    return _statusThresholds;
+    return STATUS_THRESHOLDS;
 }
-
-const _statusThresholds = {};

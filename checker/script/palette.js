@@ -1,5 +1,35 @@
 `use strict`;
 
+const CLiP_BOARD_DATA = {
+    "kind": "character",
+    "data": {
+        "name": "",
+        "memo": "",
+        "initiative": 0,
+        "status": [
+
+        ],
+        "params": [
+            
+        ],
+        "secret": false,
+        "invisible": false,
+        "hideStatus": false,
+        "commands": "",
+    },
+}
+
+const STATUS = {
+    "label": "",
+    "value": 0,
+    "max": 0,
+}
+
+const PARAMS = {
+    "label": "",
+    "value": "",
+}
+
 function execCopy() {
     document.addEventListener("copy", _copyData);
     document.execCommand("copy");
@@ -8,68 +38,150 @@ function execCopy() {
 
 function _copyData(event) {
     event.preventDefault();
-    let string = "";
-    const secret = document.getElementById("secret").checked ? "s" : "";
-    // status
-    const all_status = FILE_DATA["status"];
-    const martial_arts = FILE_DATA["status"]["battle"]["《マーシャルアーツ》"].slice(0, -1);
-    const medicine = FILE_DATA["status"]["knowledge"]["《医学》"].slice(0, -1);
-    const db = FILE_DATA["parameter"]["original"]["DB"];
-    for (let all_key in all_status) {
-        const status_data = all_status[all_key];
-        const status_keys = Object.keys(status_data);
-        for (let i=0, l=status_keys.length; i<l; i++) {
-            const key = status_keys[i];
-            const value = status_data[key].slice(0, -1);
+    const clipborad_data = _clone(CLiP_BOARD_DATA);
+    console.log(clipborad_data);
 
-            string += secret + "ccb<="+ value + " " + key + "\n";
-            switch (key) {
-                case "《キック》": case "《こぶし（パンチ）》": case "《頭突き》": case "《組み付き》":
-                    const bonus ="(" + db + ")";
-                    string += secret + 1 + DAMAGE[key] + "+" + bonus +  " " + key + "ダメージ" + "\n";
-                    if (martial_arts > 1) {
-                        const dice = "cbrb" + "(" + martial_arts + "," + value + ")";
-                        string += secret + dice + " " + "MA" + key + "\n";
-                        string += secret + 2 + DAMAGE[key] + "+" + bonus +  " " + "MA" + key + "ダメージ" + "\n";
-                    }
-                    break;
-                case "《応急手当》":
-                    string += secret + "1d3"+ " " + key + "回復" + "\n";
-                    if(medicine > 5) {
-                        const dice = "cbrb" + "(" + medicine + "," + value + ")";
-                        string += secret + dice + " " + "《医学》＋" + key + "\n";
-                        string += secret + "2d3" + " " + "《医学》＋" + key + "回復" + "\n";
-                    }
-                    break;
-                case "《精神分析》":
-                    string += secret + "1d3"+ " " + key + "回復" + "\n";
-                    break;
-                default:
-                    break;
+    clipborad_data.data.name = FILE_DATA.character["キャラクター名"];
+    _setStatus(FILE_DATA.status, clipborad_data.data.status);
+    _setParams(FILE_DATA.parameter, clipborad_data.data);
+
+    clipborad_data.data.commands = _createCommand();
+    
+    event.clipboardData.setData("text/plain", JSON.stringify(clipborad_data));
+}
+
+function _setStatus(status, data) {
+    for (let key in status) {
+        const item = _clone(STATUS);
+        const value = Number(status[key]);
+        item.label = key;
+        item.value = value;
+        item.max = value;
+        data.push(item);
+    }
+}
+
+function _setParams(parameter, data) {
+    for (let key in parameter) {
+        const item = _clone(PARAMS);
+        const value = parameter[key];
+        item.label = key;
+        item.value = value;
+        data.params.push(item);
+        if (key == "DEX") {
+            data.initiative = Number(value);
+        }
+    }
+}
+
+function _createCommand() {
+    let command = "";
+    const secret = document.getElementById("secret").checked ? "s" : "";
+    command += _createParameterCommand(FILE_DATA.parameter, secret);
+    command += _createAbilityCommand(FILE_DATA.ability, secret);
+    command += _createDefaultCommand(FILE_DATA.parameter, secret);
+    command += secret + "ccb<={SAN} 《SANチェック》\n";
+    return command;
+}
+
+function _createParameterCommand(parameter, secret) {
+    let command = "";
+    for (let key in parameter) {
+        if (key == "DB") continue;
+        for (let level = 1; level <= 5; level++) {
+            const thr = "{" + key + "}" + "*" + level;
+            const label = "《" + key + "×" + level + "》";
+            command += secret + "ccb<=" + thr + " " + label + "\n";
+        }
+    }
+    return command;
+}
+
+function _createAbilityCommand(ability, secret) {
+    let command = "";
+    const martial_arts = ability.battle["マーシャルアーツ"];
+    const medicine = ability.knowledge["医学"];
+    // battle
+    for (let key in ability.battle) {
+        const thr = ability.battle[key];
+        const name = _decorateKey(key);
+
+        const damage = DAMAGE[name];
+        command += secret + "ccb<="+ thr + " " + name + "\n";
+        if (damage !== undefined) {
+            const bonus = "({DB})";
+            const label = name + "ダメージ";
+            command += secret + "1" + damage + "+" + bonus + " " + label + "\n";
+            if (martial_arts > 1) {
+                const dice = "cbrb" + "(" + martial_arts + "," + thr + ")";
+                const martial_key = "MA" + name;
+                const martial_label = martial_key + "ダメージ";
+                command += secret + dice + " " + martial_key + "\n";
+                command += secret + "2" + damage + "+" + bonus + " " + martial_label + "\n";
             }
         }
     }
-    
-    // parameter original
-    const parameter_original = FILE_DATA["parameter"]["original"];
-    const original_keys = Object.keys(parameter_original);
-    for (let i=0, l=original_keys.length; i<l; i++) {
-        const key = original_keys[i];
-        const value = parameter_original[key];
-        if(key == "DB") continue;
-        for (let level = 1; level <= 5; level++) {
-            string += secret + "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
-        }        
+    // explore
+    for (let key in ability.explore) {
+        const thr = ability.explore[key];
+        const name = _decorateKey(key);
+
+        const recover = RECOVER[name];
+        command += secret + "ccb<=" + thr + " " + name + "\n";
+        if (recover !== undefined) {
+            const label = key + "回復";
+            command += secret + "1" + recover + " " + label + "\n";
+        }
+        if (name == "《応急手当》" && medicine > 5) {            
+            const dice = "cbrb" + "(" + medicine + "," + thr + ")";
+            const medicine_key = "《医学》" + "＋" + name;
+            const medicine_label = medicine_key + "回復";
+            command += secret + dice + " " + medicine_key + "\n";
+            command += secret + "2" + recover + " " + medicine_label + "\n";
+        }
     }
-    // parameter ability
-    const parameter_ability = FILE_DATA["parameter"]["ability"];
-    const ability_keys = Object.keys(parameter_ability);
-    for (let i=0, l=ability_keys.length; i<l; i++) {
-        const key = ability_keys[i];
-        const value = parameter_ability[key];
-        string += secret + "ccb<=" + value + " " + "《" + key + "》" + "\n";
+    // action
+    for (let key in ability.action) {
+        const thr = ability.action[key];
+        const name = _decorateKey(key);
+
+        command += secret + "ccb<=" + thr + " " + name + "\n";
     }
-    string += secret + "ccb<={SAN} 《SANチェック》\n";
-    console.log(string);
-    event.clipboardData.setData("text/plain", string);
+    // negotiation
+    for (let key in ability.negotiation) {
+        const thr = ability.negotiation[key];
+        const name = _decorateKey(key);
+
+        command += secret + "ccb<=" + thr + " " + name + "\n";
+    }
+    // knowledge
+    for (let key in ability.knowledge) {
+        const thr = ability.knowledge[key];
+        const name = _decorateKey(key);
+
+        command += secret + "ccb<=" + thr + " " + name + "\n";
+    }
+    return command;
+}
+
+function _createDefaultCommand(parameter, secret) {
+    let command = "";
+    // アイデア
+    const idea = Math.min(parameter["INT"]*5, 99);
+    command += secret + "ccb<=" + idea + " " +  _decorateKey("アイデア") + "\n";
+    // 幸運
+    const fortune = Math.min(parameter["POW"]*5, 99);
+    command += secret + "ccb<=" + fortune + " " +  _decorateKey("幸運") + "\n";
+    // 知識
+    const knowledge = Math.min(parameter["EDU"]*5, 99);
+    command += secret + "ccb<=" + knowledge + " " +  _decorateKey("知識") + "\n";
+    return command;
+}
+
+function _decorateKey(key) {
+    return "《" + key + "》";
+}
+
+function _clone(src) {
+    return JSON.parse(JSON.stringify(src));
 }
