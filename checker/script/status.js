@@ -7,6 +7,8 @@ const DAMAGE = {
     "《組み付き》": "d6",
 }
 
+let STATUS_THRESHOLDS = {};
+
 function setAllAndRevalidate() {
     const value = document.getElementById("allvalue_setter").value;
     _setAllThreshold(value);
@@ -28,7 +30,7 @@ function _printCustomSettings(key, value) {
 }
 
 function _setThreshold(status) {
-    if (Object.keys(_statusThresholds).length == 0) {
+    if (Object.keys(STATUS_THRESHOLDS).length == 0) {
         for (let value of Object.values(status)) {
             _initThreshold(value);
         }
@@ -38,7 +40,7 @@ function _setThreshold(status) {
 function _initThreshold(status) {
     const keys = Object.keys(status);
     for (let i=0, l=keys.length; i<l; i++) {
-        _statusThresholds[keys[i]] = -1;
+        STATUS_THRESHOLDS[keys[i]] = -1;
     }
     const value = document.getElementById("allvalue_setter").value;
     _setAllThreshold(value);
@@ -50,27 +52,25 @@ function _setAllThreshold(value) {
     } else if (value > 99) {
         value = document.getElementById("allvalue_setter").value = 99;
     }
-    const keys = Object.keys(_statusThresholds);
+    const keys = Object.keys(STATUS_THRESHOLDS);
     for (let i=0, l=keys.length; i<l; i++) {
-        _statusThresholds[keys[i]] = value;
+        STATUS_THRESHOLDS[keys[i]] = value;
     }
 }
 
 function _setCustomThreshold(key, value) {
     console.log(key);
     console.log(value);
-    _statusThresholds[key] = value;
+    STATUS_THRESHOLDS[key] = value;
 }
 
 function _deleteThreshold() {
-    const keys = Object.keys(_statusThresholds);
+    const keys = Object.keys(STATUS_THRESHOLDS);
     for (let i=0, l=keys.length; i<l; i++) {
-        delete _statusThresholds[keys[i]];
+        delete STATUS_THRESHOLDS[keys[i]];
     }
 }
 
 function _getThreshold() {
-    return _statusThresholds;
+    return STATUS_THRESHOLDS;
 }
-
-const _statusThresholds = {};

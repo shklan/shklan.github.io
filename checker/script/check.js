@@ -3,6 +3,7 @@
 const FILE_DATA_FORMAT = {
     "profile": {},
     "status": {},
+    "parameter": {},
     "ability": {
         "battle": {},
         "explore": {},
@@ -22,17 +23,14 @@ async function _validate() {
     files = document.getElementById("fileInput").files;
     const files_len = files.length;
     const status_output = document.getElementById("status");
-    const profile_output = document.getElementById("profile");
     if (files_len != 1) {
         throw err;
     }
     const file = files[0];
     await _extractData(file);
-    _setThreshold(FILE_DATA["status"]);
-    const statusThreshold = _getThreshold();
+    _setThreshold(FILE_DATA.ability);
 
-    _printStatus(status_output, FILE_DATA["status"], statusThreshold);
-    // _printProfile(profile_output, FILE_DATA["profile"]);
+    _printStatus(status_output, FILE_DATA.ability);
     _enableChatPaletteCopyButton()
 }
 
@@ -55,13 +53,13 @@ async function validate_drop(dropfiles) {
     _createCustomSetter();
 }
 
-function _printStatus(output, all_data, statusThreshold) {
+function _printStatus(output, all_data) {
     const all_keys = Object.keys(all_data);
     for (let all_i=0, all_l=all_keys.length; all_i<all_l; all_i++) {
         const data = all_data[all_keys[all_i]];
         const keys = Object.keys(data);
         for (let i=0, l=keys.length; i<l; i++) {
-            let thr = statusThreshold[keys[i]];
+            let thr = STATUS_THRESHOLDS[keys[i]];
             let value = data[keys[i]];
             if (parseInt(value.split("％")[0], 10) > thr) {
                 output.innerHTML += '<font color = "red">' + keys[i] + ": " + value + "</font><br>";
@@ -72,17 +70,17 @@ function _printStatus(output, all_data, statusThreshold) {
     }
 }
 
-function _printProfile(output, data) {
-    const keys = Object.keys(data);
-    for (let i=0, l=keys.length; i<l; i++) {
-        const value = data[keys[i]];
-        if (value == "" | value == "\r") {
-            output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
-        } else {
-            output.innerHTML += keys[i] + ": " + value + "<br>";
-        }
-    }
-}
+// function _printProfile(output, data) {
+//     const keys = Object.keys(data);
+//     for (let i=0, l=keys.length; i<l; i++) {
+//         const value = data[keys[i]];
+//         if (value == "" | value == "\r") {
+//             output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
+//         } else {
+//             output.innerHTML += keys[i] + ": " + value + "<br>";
+//         }
+//     }
+// }
 
 async function _extractData(file) {
     FILE_DATA = _clone(FILE_DATA_FORMAT);
@@ -91,15 +89,15 @@ async function _extractData(file) {
     const parser = _makeParser(tokens);
     _extractCharacter(parser);
     _extractStatus(parser);
+    _extractParameter(parser);
     _extractAbility(parser);
     const damage_bonus = parser.next();
     _extractWeapon(parser);
     _extractPersonalEffects(parser);
     _extractOther(parser);
     _extractSimpleData(parser);
-    // _extractProfile(parser);
+    _extractProfile(parser);
 
-    console.log(tokens);
     console.log(FILE_DATA);
     return;
 }
@@ -130,8 +128,11 @@ function _makeParser(tokens) {
 function _extractCharacter(parser) {
     let token;
     while ((token = parser.next()) != null && token != "■能力値■") {
-        const [key, ...value] = token.split("：");
-        FILE_DATA.profile[key] = value.join();
+        const [key, ...val] = token.split("：");
+        const value = val.join();
+        if (value.length) {
+            FILE_DATA.profile[key] = value;
+        }        
     }
 }
 
@@ -142,7 +143,9 @@ function _extractStatus(parser) {
     FILE_DATA.status["HP"] = hp;
     FILE_DATA.status["MP"] = mp;
     FILE_DATA.status["SAN"] = san;
+}
 
+function _extractParameter(parser) {
     let token;
     let status_name_list = []; 
     let status_begin_list = [];
@@ -160,11 +163,8 @@ function _extractStatus(parser) {
     while ((token = parser.next()) != null && token != "■技能■") {
         status_end_list.push(token);
     }
-    for (let i=0, l=status_name_list.length; i<l; i++) {
-        if (status_begin_list[i] != status_end_list[i]) {
-            // 警告を出す処理
-        }
-        FILE_DATA.status[status_name_list[i]] = status_end_list[i];
+    for (let i=0, l=status_name_list.length; i<l-2; i++) {//hp, mp 除外
+        FILE_DATA.parameter[status_name_list[i]] = [status_begin_list[i], status_end_list[i]];
     }
 }
 
