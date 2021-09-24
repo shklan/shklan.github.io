@@ -18,6 +18,7 @@ const FILE_DATA_FORMAT = {
 };
 
 let FILE_DATA = null;
+let PRESET = null;
 
 async function _validate() {
     const err = new Error();
@@ -25,20 +26,32 @@ async function _validate() {
     files = document.getElementById("fileInput").files;
     const files_len = files.length;
     const status_output = document.getElementById("status");
+    const warning_output = document.getElementById("warning");
     if (files_len != 1) {
         throw err;
     }
     const file = files[0];
     await _extractData(file);
     _setThreshold(FILE_DATA.ability);
-
     _printStatus(status_output, FILE_DATA.ability);
-    _enableChatPaletteCopyButton()
+    if (Object.keys(PRESET).length > 0) {
+        _printWarning(warning_output);        
+    } else {
+        _enableChatPaletteCopyButton();
+    }
 }
 
 function revalidate() {
     _clearDataOutput();
     _validate();
+}
+
+function presetValue(event) {
+    const target = event.target;
+    const key = target.parentElement.innerText;
+    const value = target.value;
+    PRESET[key] = value;
+    console.log(PRESET);
 }
 
 async function validate_input() {
@@ -55,25 +68,53 @@ async function validate_drop(dropfiles) {
     _createCustomSetter();
 }
 
-function _printStatus(output, all_data) {
-    const all_keys = Object.keys(all_data);
-    for (let all_i=0, all_l=all_keys.length; all_i<all_l; all_i++) {
-        const data = all_data[all_keys[all_i]];
-        const keys = Object.keys(data);
-        for (let i=0, l=keys.length; i<l; i++) {
-            let thr = STATUS_THRESHOLDS[keys[i]];
-            let value = data[keys[i]];
-            if (parseInt(value.split("％")[0], 10) > thr) {
-                output.innerHTML += '<font color = "red">' + keys[i] + ": " + value + "</font><br>";
+function _printStatus(output, ability) {
+    for (let type in ability) {
+        const status = ability[type];
+        for (let key in status) {
+            const thr = STATUS_THRESHOLDS[key];
+            const value = status[key];
+            if (Number(value) > thr) {
+                output.innerHTML += '<font color = "red">' + key + ": " + value + "</font><br>";
             } else {
-                output.innerHTML += keys[i] + ": " + value + "<br>";
+                output.innerHTML += key + ": " + value + "<br>";
             }
         }
     }
 }
 
+function _printWarning(output) {
+    output.innerHTML += '<font color = "red">正しく読み取れなかった値があります<font><br>';
+    output.innerHTML += "手動で設定してください<br>";
+    for (let key in PRESET) {
+        _createPresetInput(key);
+    }
+    const revalidate_button = document.createElement("button");
+    revalidate_button.innerText = "再チェック";
+    revalidate_button.onclick = revalidate;
+    document.getElementById("warning").appendChild(revalidate_button);
+}
+
+function _createPresetInput(key) {
+    const warn = document.getElementById("warning");
+    const div_elem = document.createElement("div");
+    const label_elem = document.createElement("label");
+    const input_elem = document.createElement("input");
+
+    label_elem.innerText = key;
+    input_elem.type = "text";
+    
+    label_elem.appendChild(input_elem);
+    div_elem.appendChild(label_elem);
+    warn.appendChild(div_elem);
+}
+
 async function _extractData(file) {
     FILE_DATA = _clone(FILE_DATA_FORMAT);
+    console.log(PRESET);
+    if (PRESET == null) {
+        PRESET = {};
+    }
     const text = await _read(file);
     const tokens = text.split(/\r*\n|\s+|●|《|》|\//).filter(token => token.length > 0);
     const parser = _makeParser(tokens);
@@ -102,6 +143,16 @@ function _read(file) {
     })
 }
 
+function _inPreset(key) {
+    return PRESET.hasOwnProperty(key);
+}
+
+function _popPresetValue(key) {
+    const value = PRESET[key];
+    delete PRESET[key];
+    return value;
+}
+
 function _makeParser(tokens) {
     const max = tokens.length;
     let seek = 0;
@@ -127,18 +178,35 @@ function _extractCharacter(parser) {
     }
 }
 
+function _warnEquality(key, src, dst) {
+    if (src != dst) {
+        PRESET[key] = Number.NaN;
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function _warnValue(key, value) {
+    const num = Number(value);
+    if (isNaN(num)) {
+        PRESET[key] = Number.NaN;
+        return false;
+    } else {
+        return true;
+    }
+}
+
 function _extractStatus(parser) {
     // hp
-    const hp = parser.next().split("：")[1];
-    FILE_DATA.status["HP"] = hp;
-
+    const hp = _inPreset("HP") ? _popPresetValue("HP") : parser.next().split("：")[1];
+    if (_warnValue("HP", hp)) FILE_DATA.status["HP"] = hp;
     // mp
-    const mp = parser.next().split("：")[1];
-    FILE_DATA.status["MP"] = mp;
-
+    const mp = _inPreset("MP") ? _popPresetValue("MP") : parser.next().split("：")[1];
+    if (_warnValue("MP", mp)) FILE_DATA.status["MP"] = mp;
     // san
-    const san = parser.next().split("：")[1];
-    FILE_DATA.status["SAN"] = san;
+    const san = _inPreset("SAN") ? _popPresetValue("SAN") : parser.next().split("：")[1];
+    if (_warnValue("SAN", san)) FILE_DATA.status["SAN"] = san;
 }
 
 function _extractParameter(parser) {
@@ -160,13 +228,13 @@ function _extractParameter(parser) {
         status_end_list.push(token);
     }
     for (let i=0, l=status_name_list.length; i<l-2; i++) {//hp, mp 除外
-        const befere = status_begin_list[i];
-        const after = status_end_list[i]
-        if (befere != after || isNaN(Number(after))) {
-            // 警告を出す
-        } else {
-            FILE_DATA.parameter[status_name_list[i]] = after;
-        }        
+        const key = status_name_list[i];
+        const presetValue = _inPreset(key) ? _popPresetValue(key) : null;
+        const befere = (presetValue == null) ? status_begin_list[i] : presetValue;
+        const after = (presetValue == null) ? status_end_list[i] : presetValue;
+        if (_warnEquality(key, befere, after) || _warnValue(key, after)) {
+            FILE_DATA.parameter[key] = after;
+        }
     }
 }
 
@@ -196,9 +264,9 @@ function _extractSpecificAbilityTo(parser, data) {
         if (!value.endsWith("％")) {
             break;
         }
-        const num = value.slice(0, -1);
-        if (num.length) {
-            data["《" + key + "》"] = num;
+        const num = _inPreset(key) ? _popPresetValue(key) : value.slice(0, -1);
+        if (_warnValue(key, num) && num.length > 0) {
+            data[key] = num;
         }
     }
 }

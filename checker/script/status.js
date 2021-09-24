@@ -34,21 +34,19 @@ function _printCustomSettings(key, value) {
     output.innerHTML += key + "の上限: " + value + "%<br>";
 }
 
-function _setThreshold(status) {
-    if (Object.keys(STATUS_THRESHOLDS).length == 0) {
-        for (let value of Object.values(status)) {
-            _initThreshold(value);
-        }
-    }
-}
-
-function _initThreshold(status) {
-    const keys = Object.keys(status);
-    for (let i=0, l=keys.length; i<l; i++) {
-        STATUS_THRESHOLDS[keys[i]] = -1;
-    }
+function _setThreshold(ability) {
+    _initThreshold(ability);
     const value = document.getElementById("allvalue_setter").value;
     _setAllThreshold(value);
+}
+
+function _initThreshold(ability) {
+    for (let type in ability) {
+        const status = ability[type];
+        for (let key in status) {
+            STATUS_THRESHOLDS[key] = -1;
+        }
+    }    
 }
 
 function _setAllThreshold(value) {

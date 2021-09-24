@@ -86,6 +86,7 @@ function _createCommand() {
 function _createParameterCommand(parameter, secret) {
     let command = "";
     for (let key in parameter) {
+        if (key == "DB") continue;
         for (let level = 1; level <= 5; level++) {
             const thr = "{" + key + "}" + "*" + level;
             const label = "《" + key + "×" + level + "》";
@@ -97,20 +98,22 @@ function _createParameterCommand(parameter, secret) {
 
 function _createAbilityCommand(ability, secret) {
     let command = "";
-    const martial_arts = ability.battle["《マーシャルアーツ》"];
-    const medicine = ability.knowledge["《医学》"];
+    const martial_arts = ability.battle["マーシャルアーツ"];
+    const medicine = ability.knowledge["医学"];
     // battle
     for (let key in ability.battle) {
         const thr = ability.battle[key];
-        const damage = DAMAGE[key];
-        command += secret + "ccb<="+ thr + " " + key + "\n";
+        const name = _decorateKey(key);
+
+        const damage = DAMAGE[name];
+        command += secret + "ccb<="+ thr + " " + name + "\n";
         if (damage !== undefined) {
             const bonus = "({DB})";
-            const label = key + "ダメージ";
+            const label = name + "ダメージ";
             command += secret + "1" + damage + "+" + bonus + " " + label + "\n";
             if (martial_arts > 1) {
                 const dice = "cbrb" + "(" + martial_arts + "," + thr + ")";
-                const martial_key = "MA" + key;
+                const martial_key = "MA" + name;
                 const martial_label = martial_key + "ダメージ";
                 command += secret + dice + " " + martial_key + "\n";
                 command += secret + "2" + damage + "+" + bonus + " " + martial_label + "\n";
@@ -120,15 +123,17 @@ function _createAbilityCommand(ability, secret) {
     // explore
     for (let key in ability.explore) {
         const thr = ability.explore[key];
-        const recover = RECOVER[key];
-        command += secret + "ccb<=" + thr + " " + key + "\n";
+        const name = _decorateKey(key);
+
+        const recover = RECOVER[name];
+        command += secret + "ccb<=" + thr + " " + name + "\n";
         if (recover !== undefined) {
             const label = key + "回復";
             command += secret + "1" + recover + " " + label + "\n";
         }
-        if (key == "《応急手当》" && medicine > 5) {            
+        if (name == "《応急手当》" && medicine > 5) {            
             const dice = "cbrb" + "(" + medicine + "," + thr + ")";
-            const medicine_key = "ME" + key;
+            const medicine_key = "《医学》" + "＋" + name;
             const medicine_label = medicine_key + "回復";
             command += secret + dice + " " + medicine_key + "\n";
             command += secret + "2" + recover + " " + medicine_label + "\n";
@@ -137,19 +142,29 @@ function _createAbilityCommand(ability, secret) {
     // action
     for (let key in ability.action) {
         const thr = ability.action[key];
-        command += secret + "ccb<=" + thr + " " + key + "\n";
+        const name = _decorateKey(key);
+
+        command += secret + "ccb<=" + thr + " " + name + "\n";
     }
     // negotiation
     for (let key in ability.negotiation) {
         const thr = ability.negotiation[key];
-        command += secret + "ccb<=" + thr + " " + key + "\n";
+        const name = _decorateKey(key);
+
+        command += secret + "ccb<=" + thr + " " + name + "\n";
     }
     // knowledge
     for (let key in ability.knowledge) {
         const thr = ability.knowledge[key];
-        command += secret + "ccb<=" + thr + " " + key + "\n";
+        const name = _decorateKey(key);
+
+        command += secret + "ccb<=" + thr + " " + name + "\n";
     }
     return command;
+}
+
+function _decorateKey(key) {
+    return "《" + key + "》";
 }
 
 function _clone(src) {
