@@ -1,10 +1,32 @@
 `use strict`;
 
+let FILE_DATA = null;
+
 const DAMAGE = {
     "《こぶし（パンチ）》": "d3",
     "《頭突き》": "d4",
     "《キック》": "d6",
     "《組み付き》": "d6",
+}
+
+function setAllAndRevalidate() {
+    const value = document.getElementById("allvalue_setter").value;
+    _setAllThreshold(value);
+    _clearCustomOutput();
+    revalidate();
+}
+
+function setCustomAndRevalidate() {
+    const key = document.getElementById("custom_selector").value;
+    const value = document.getElementById("customvalue_setter").value;
+    _setCustomThreshold(key, value);
+    _printCustomSettings(key, value);
+    revalidate();
+}
+
+function _printCustomSettings(key, value) {
+    const output = document.getElementById("customsettings_output");
+    output.innerHTML += key + "の上限: " + value + "%<br>";
 }
 
 function _setThreshold(status) {
