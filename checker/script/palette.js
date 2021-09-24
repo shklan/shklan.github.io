@@ -1,5 +1,35 @@
 `use strict`;
 
+const CLiP_BOARD_DATA = {
+    "kind": "character",
+    "data": {
+        "name": "",
+        "memo": "",
+        "initiative": 0,
+        "status": [
+
+        ],
+        "params": [
+            
+        ],
+        "secret": false,
+        "invisible": false,
+        "hideStatus": false,
+        "commands": "",
+    },
+}
+
+const STATUS = {
+    "label": "",
+    "value": 0,
+    "max": 0,
+}
+
+const PARAMS = {
+    "label": "",
+    "value": "",
+}
+
 function execCopy() {
     document.addEventListener("copy", _copyData);
     document.execCommand("copy");
@@ -8,7 +38,28 @@ function execCopy() {
 
 function _copyData(event) {
     event.preventDefault();
-    let string = "";
+    const clipborad_data = _clone(CLiP_BOARD_DATA);
+
+    clipborad_data.data.name = FILE_DATA.profile["キャラクター名"];
+    clipborad_data.data.memo = FILE_DATA.profile["プロフィール"];
+    _setStatus(clipborad_data);
+    _setParams(clipborad_data);
+    clipborad_data.data.commands = _createChatPalette();
+
+    console.log(clipborad_data);
+    event.clipboardData.setData("text/plain", JSON.stringify(clipborad_data));
+}
+
+function _setStatus(data) {
+
+}
+
+function _setParams(data) {
+
+}
+
+function _createChatPalette() {
+    let chat_palette = "";
     const secret = document.getElementById("secret").checked ? "s" : "";
     // status
     const all_status = FILE_DATA["status"];
@@ -22,27 +73,27 @@ function _copyData(event) {
             const key = status_keys[i];
             const value = status_data[key].slice(0, -1);
 
-            string += secret + "ccb<="+ value + " " + key + "\n";
+            chat_palette += secret + "ccb<="+ value + " " + key + "\n";
             switch (key) {
                 case "《キック》": case "《こぶし（パンチ）》": case "《頭突き》": case "《組み付き》":
                     const bonus ="(" + db + ")";
-                    string += secret + 1 + DAMAGE[key] + "+" + bonus +  " " + key + "ダメージ" + "\n";
+                    chat_palette += secret + 1 + DAMAGE[key] + "+" + bonus +  " " + key + "ダメージ" + "\n";
                     if (martial_arts > 1) {
                         const dice = "cbrb" + "(" + martial_arts + "," + value + ")";
-                        string += secret + dice + " " + "MA" + key + "\n";
-                        string += secret + 2 + DAMAGE[key] + "+" + bonus +  " " + "MA" + key + "ダメージ" + "\n";
+                        chat_palette += secret + dice + " " + "MA" + key + "\n";
+                        chat_palette += secret + 2 + DAMAGE[key] + "+" + bonus +  " " + "MA" + key + "ダメージ" + "\n";
                     }
                     break;
                 case "《応急手当》":
-                    string += secret + "1d3"+ " " + key + "回復" + "\n";
+                    chat_palette += secret + "1d3"+ " " + key + "回復" + "\n";
                     if(medicine > 5) {
                         const dice = "cbrb" + "(" + medicine + "," + value + ")";
-                        string += secret + dice + " " + "《医学》＋" + key + "\n";
-                        string += secret + "2d3" + " " + "《医学》＋" + key + "回復" + "\n";
+                        chat_palette += secret + dice + " " + "《医学》＋" + key + "\n";
+                        chat_palette += secret + "2d3" + " " + "《医学》＋" + key + "回復" + "\n";
                     }
                     break;
                 case "《精神分析》":
-                    string += secret + "1d3"+ " " + key + "回復" + "\n";
+                    chat_palette += secret + "1d3"+ " " + key + "回復" + "\n";
                     break;
                 default:
                     break;
@@ -58,7 +109,7 @@ function _copyData(event) {
         const value = parameter_original[key];
         if(key == "DB") continue;
         for (let level = 1; level <= 5; level++) {
-            string += secret + "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
+            chat_palette += secret + "ccb<=" + value*level + " " + "《" + key + "×" + level + "》" + "\n";
         }        
     }
     // parameter ability
@@ -67,9 +118,13 @@ function _copyData(event) {
     for (let i=0, l=ability_keys.length; i<l; i++) {
         const key = ability_keys[i];
         const value = parameter_ability[key];
-        string += secret + "ccb<=" + value + " " + "《" + key + "》" + "\n";
+        chat_palette += secret + "ccb<=" + value + " " + "《" + key + "》" + "\n";
     }
-    string += secret + "ccb<={SAN} 《SANチェック》\n";
-    console.log(string);
-    event.clipboardData.setData("text/plain", string);
+    chat_palette += secret + "ccb<={SAN} 《SANチェック》\n";
+    // console.log(chat_palette);
+    return chat_palette;
+}
+
+function _clone(src) {
+    return JSON.parse(JSON.stringify(src));
 }

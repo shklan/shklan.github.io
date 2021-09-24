@@ -1,5 +1,19 @@
 `use strict`;
 
+const FILE_DATA_FORMAT = {
+    "profile": {},
+    "status": {},
+    "ability": {
+        "battle": {},
+        "explore": {},
+        "action": {},
+        "negotiation": {},
+        "knowledge": {},
+    },
+};
+
+let FILE_DATA = null;
+
 async function _validate() {
     const err = new Error();
     console.log("validation start");
@@ -11,12 +25,12 @@ async function _validate() {
         throw err;
     }
     const file = files[0];
-    FILE_DATA = await _extractData(file);
+    await _extractData(file);
     _setThreshold(FILE_DATA["status"]);
     const statusThreshold = _getThreshold();
 
     _printStatus(status_output, FILE_DATA["status"], statusThreshold);
-    _printProfile(profile_output, FILE_DATA["profile"]);
+    // _printProfile(profile_output, FILE_DATA["profile"]);
     _enableChatPaletteCopyButton()
 }
 
@@ -69,12 +83,17 @@ function _printProfile(output, data) {
 }
 
 async function _extractData(file) {
-    let data = {};
-    let text = await _read(file);
-    data["profile"] = _extractProfile(text);
-    data["status"] = _extractStatus(text);
-    data["parameter"] = _extractParameters(text);
-    return data;
+    FILE_DATA = _clone(FILE_DATA_FORMAT);
+    const text = await _read(file);
+    const tokens = text.split(/\r*\n|\s+|\//).filter(token => token.length > 0);
+    const parser = _makeParser(tokens);
+    // perser.next();
+    _extractProfile(parser);
+    _extractStatus(parser);
+    _extractAbility(parser);
+    // _extractParameters(text);
+    console.log(FILE_DATA);
+    return;
 }
 
 function _read(file) {
@@ -86,113 +105,98 @@ function _read(file) {
     })
 }
 
-function _extractProfile(text) {
-    let data = {};
-    let tokens = text.split(/(\n| \/ )/);
-    for(let i=0, l=tokens.length; i<l; i++) {
-        if (tokens[i] == "■能力値■") {
-            break;
-        }
-        const text = tokens[i].split("：")
-        switch(text[0]) {
-            case "キャラクター名": data["キャラクター名"]=text[1]; break;
-            case "職業": data["職業"]=text[1]; break;
-            case "年齢": data["年齢"]=text[1]; break;
-            case "性別": data["性別"]=text[1]; break;
-            case "出身": data["出身"]=text[1]; break;
-            case "髪の色": data["髪の色"]=text[1]; break;
-            case "瞳の色": data["瞳の色"]=text[1]; break;
-            case "肌の色": data["肌の色"]=text[1]; break;
-            case "身長": data["身長"]=text[1]; break;
-            case "体重": data["体重"]=text[1]; break;
-        }
+function _makeParser(tokens) {
+    const max = tokens.length;
+    let seek = 0;
+    return {
+        "next": function () {
+            return (seek < max) ? tokens[seek++] : null;
+        },
+        "skipTo": function (token) {
+            while(seek < max && tokens[seek] != token) seek++;
+        },
     }
-    return data;
+}
+function _extractProfile(parser) {
+    let token;
+    while ((token = parser.next()) != "■能力値■") {
+        const [key, ...value] = token.split("：");
+        FILE_DATA.profile[key] = value.join();
+    }
 }
 
-function _extractStatus(text) {
-    let battle_data = {};
-    let search_data = {};
-    let action_data = {};
-    let negotiation_data = {};
-    let knowledge_data = {};
-    let data;
-    let tokens = text.split("■技能■")[1].split(/\n|\s|　/);
-    for(let i=0, l=tokens.length; i<l; i++) {
-        if (tokens[i] == "■戦闘■") {
-            break;
-        }
-        const text = tokens[i];
-        switch(text[0]) {
-            case "戦":
-                data = battle_data;
-                break;
-            case "探":
-                data = search_data;
-                break;
-            case "行":
-                data = action_data;
-                break;
-            case "交":
-                data = negotiation_data;
-                break;
-            case "知":
-                data = knowledge_data;
-                break;
-            case "《": 
-                const num_a = text.split("》")[1];
-                if (num_a.length == 0) {
-                    const next = _nextNum(i+1, tokens);
-                    if(next.length > 1) data[text]=next;
-                } else {
-                    key = text.slice(0, text.indexOf(num_a));
-                    if(num_a.length > 1) data[key]=num_a;
-                }
-                break;
-            case "●":
-                const num_b = text.split("》")[1];
-                if (num_b.length == 0) {
-                    const next = _nextNum(i+1, tokens)
-                    if(next.length > 1) data[text.slice(1)]=next;
-                } else {
-                    key = text.slice(1, text.indexOf(num_b));
-                    if(num_b.length > 1) data[key]=num_b; 
-                }
-                break;
-        }
+function _extractStatus(parser) {
+    const hp = parser.next().split("：")[1];
+    const mp = parser.next().split("：")[1];
+    const san = parser.next().split("：")[1];
+    FILE_DATA.status["HP"] = hp;
+    FILE_DATA.status["MP"] = mp;
+    FILE_DATA.status["SAN"] = san;
+
+    let token;
+    let status_name_list = []; 
+    let status_begin_list = [];
+    let status_end_list = [];
+
+    token = parser.skipTo("STR");
+    while ((token = parser.next()) != "作成時") {
+        status_name_list.push(token);
     }
-    return {"battle": battle_data, "search": search_data, "action": action_data, "negotiation": negotiation_data, "knowledge": knowledge_data};
+    while ((token = parser.next()) != "成長等") {
+        status_begin_list.push(token);
+    }
+    token = parser.skipTo("=合計=");
+    parser.next();
+    while ((token = parser.next()) != "■技能■") {
+        status_end_list.push(token);
+    }
+    for (let i=0, l=status_name_list.length; i<l; i++) {
+        if (status_begin_list[i] != status_end_list[i]) {
+            // 警告を出す処理
+        }
+        FILE_DATA.status[status_name_list[i]] = status_end_list[i];
+    }
+    // console.log(status_begin_list);
+    // console.log(status_end_list);
 }
 
-function _extractParameters(text) {
-    let data = {"original": {}, "ability": {}};
-    let tokens = text.split("■簡易用■")[1].split(/\r*\n|　/);
-    for(let i=0, l=tokens.length; i<l; i++) {
-        const text = tokens[i];
-        if (text[0] == "-") break;
-        const splitted = text.split(":");
-        const key = splitted[0];
-        const value = splitted[1];
-        switch(key) {
-            case "STR": case "DEX": case "INT": case "CON": case "APP": case "POW": case "SIZ": case "EDU":
-                data["original"][key] = value;
-                break;
-            case "ﾀﾞﾒｰｼﾞﾎﾞｰﾅｽ":
-                data["original"]["DB"] = value;
-                break;
-            case "ｱｲﾃﾞｱ":
-                data["ability"]["アイデア"] = value;
-                break;
-            case "幸 運":
-                data["ability"]["幸運"] = value;
-                break;
-            case "知 識":
-                data["ability"]["知識"] = value;
-                break;
-        }
-    }
-    return data;
+function _extractAbility(parser) {
+
 }
+
+function _extractParameters(parser) {
+
+}
+
+// function _extractParameters(text) {
+//     let data = {"original": {}, "ability": {}};
+//     let tokens = text.split("■簡易用■")[1].split(/\r*\n|　/);
+//     for(let i=0, l=tokens.length; i<l; i++) {
+//         const text = tokens[i];
+//         if (text[0] == "-") break;
+//         const splitted = text.split(":");
+//         const key = splitted[0];
+//         const value = splitted[1];
+//         switch(key) {
+//             case "STR": case "DEX": case "INT": case "CON": case "APP": case "POW": case "SIZ": case "EDU":
+//                 data["original"][key] = value;
+//                 break;
+//             case "ﾀﾞﾒｰｼﾞﾎﾞｰﾅｽ":
+//                 data["original"]["DB"] = value;
+//                 break;
+//             case "ｱｲﾃﾞｱ":
+//                 data["ability"]["アイデア"] = value;
+//                 break;
+//             case "幸 運":
+//                 data["ability"]["幸運"] = value;
+//                 break;
+//             case "知 識":
+//                 data["ability"]["知識"] = value;
+//                 break;
+//         }
+//     }
+//     return data;
+// }
 
 function _nextNum(i, tokens) {
     while (tokens[i].length==0) i++;

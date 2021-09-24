@@ -1,7 +1,5 @@
 `use strict`;
 
-let FILE_DATA = null;
-
 const DAMAGE = {
     "《こぶし（パンチ）》": "d3",
     "《頭突き》": "d4",
