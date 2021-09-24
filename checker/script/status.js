@@ -7,6 +7,11 @@ const DAMAGE = {
     "《組み付き》": "d6",
 }
 
+const RECOVER = {
+    "《応急手当》": "d3",
+    "《精神分析》": "d3",
+}
+
 let STATUS_THRESHOLDS = {};
 
 function setAllAndRevalidate() {

@@ -1,7 +1,7 @@
 `use strict`;
 
 const FILE_DATA_FORMAT = {
-    "profile": {},
+    "character": {},
     "status": {},
     "parameter": {},
     "ability": {
@@ -13,6 +13,8 @@ const FILE_DATA_FORMAT = {
     },
     "weapon": {},
     "personaleffects": {},
+    "other": {},
+    "profile": {},
 };
 
 let FILE_DATA = null;
@@ -70,18 +72,6 @@ function _printStatus(output, all_data) {
     }
 }
 
-// function _printProfile(output, data) {
-//     const keys = Object.keys(data);
-//     for (let i=0, l=keys.length; i<l; i++) {
-//         const value = data[keys[i]];
-//         if (value == "" | value == "\r") {
-//             output.innerHTML += '<span style="background-color:yellow">' + keys[i] + ": " + value + "</span><br>";
-//         } else {
-//             output.innerHTML += keys[i] + ": " + value + "<br>";
-//         }
-//     }
-// }
-
 async function _extractData(file) {
     FILE_DATA = _clone(FILE_DATA_FORMAT);
     const text = await _read(file);
@@ -92,6 +82,7 @@ async function _extractData(file) {
     _extractParameter(parser);
     _extractAbility(parser);
     const damage_bonus = parser.next();
+    FILE_DATA.parameter["DB"] = damage_bonus.split("：")[1];
     _extractWeapon(parser);
     _extractPersonalEffects(parser);
     _extractOther(parser);
@@ -131,17 +122,22 @@ function _extractCharacter(parser) {
         const [key, ...val] = token.split("：");
         const value = val.join();
         if (value.length) {
-            FILE_DATA.profile[key] = value;
+            FILE_DATA.character[key] = value;
         }        
     }
 }
 
 function _extractStatus(parser) {
+    // hp
     const hp = parser.next().split("：")[1];
-    const mp = parser.next().split("：")[1];
-    const san = parser.next().split("：")[1];
     FILE_DATA.status["HP"] = hp;
+
+    // mp
+    const mp = parser.next().split("：")[1];
     FILE_DATA.status["MP"] = mp;
+
+    // san
+    const san = parser.next().split("：")[1];
     FILE_DATA.status["SAN"] = san;
 }
 
@@ -164,7 +160,13 @@ function _extractParameter(parser) {
         status_end_list.push(token);
     }
     for (let i=0, l=status_name_list.length; i<l-2; i++) {//hp, mp 除外
-        FILE_DATA.parameter[status_name_list[i]] = [status_begin_list[i], status_end_list[i]];
+        const befere = status_begin_list[i];
+        const after = status_end_list[i]
+        if (befere != after || isNaN(Number(after))) {
+            // 警告を出す
+        } else {
+            FILE_DATA.parameter[status_name_list[i]] = after;
+        }        
     }
 }
 
@@ -188,7 +190,7 @@ function _extractAbility(parser) {
 
 function _extractSpecificAbilityTo(parser, data) {
     let token;
-    while ((token = parser.next()) != null && (token != "■戦闘■" || token != "------------------------")) {
+    while ((token = parser.next()) != null && token != "■戦闘■" && token != "------------------------") {
         const key = token;
         const value = parser.next();
         if (!value.endsWith("％")) {
