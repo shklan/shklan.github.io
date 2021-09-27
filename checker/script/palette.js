@@ -34,6 +34,7 @@ function execCopy() {
     document.addEventListener("copy", _copyData);
     document.execCommand("copy");
     document.removeEventListener("copy", _copyData);
+    document.getElementById("warning").innerHTML = '<font style="color: #509f00">コピーに成功しました！</font>'
 }
 
 function _copyData(event) {
