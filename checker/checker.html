@@ -10,8 +10,10 @@
             TRPG character sheet checker
         </title>
         <style>
-            .introduction {display: block; padding-bottom: 25px; margin: auto;}
-            form {width: 100%; padding: 5px; }
+            .introduction {display: block; padding: 10px; margin: auto;}
+            details > p {padding-left: 2em; margin: auto;}
+            li {padding: 1em; margin: auto;}
+            form {width: 100%; padding: 10px; }
             .checkzone {width: 1180px; display: flex; margin: 0 auto; padding: 0;}
             .output {width: 860px; display: flex; margin: 0 auto; padding: 0;}
             .settings {width: 320px; display: block; margin: 0 auto; padding: 0;}
@@ -24,9 +26,38 @@
     
     <body>
         <div class="introduction">
-        簡易的なキャラクターシートチェッカーです．<br>
-        キャラクターシートを読み込ませることで，技能値のチェックが出来ます．<br>
-        赤い表示の技能値は技能値が制約を超えていることを表します．<br>
+            <p>
+                簡易的なキャラクターシートチェッカーです．<br>
+                キャラクターシートを読み込ませることで，技能値のチェックが出来ます．<br>
+                赤い表示の技能値は技能値が制約を超えていることを表します．<br>
+            </p>        
+            <details id="details">
+                <summary>読み込みの細かい話</summary>
+                <p>
+                    <ul>
+                        <li>
+                            <a href="https://charasheet.vampire-blood.net/coc_pc_making.html" rel="noopener noreferrer" target="_blank">キャラクター保管所（COC 6版）</a>が出力する txt を元にチェックをしています．<br>
+                            txt のフォーマットから大きく変更すると読み込みエラーが発生しやすくなります．<br>
+                        </li>
+                        <li>
+                            空白・改行，：で区切ってデータを読み込みます．無闇にこれらを含めると，予期せぬ位置でデータが区切られる可能性があります．<br>
+                        </li>
+                        <li>
+                            キャラクターシートの値を読み込む際に参照している箇所
+                            <p><b> HP，MP</b>：<font style="color: #843eaa">■能力値■</font> セクション</p>
+                            <p>
+                                <b> SAN</b>：<font style="color: #843eaa">■能力値■</font> セクション，「/」の左側
+                            </p>
+                            <p>
+                                <b> STR~EDU</b>：<font style="color: #843eaa">■能力値■</font> セクション，「=合計=」の値<br>
+                                （ただし，「作成時」と「=合計=」でステータスの値が一致していない場合はエラーを出します）
+                            </p>
+                            <p><b> 各種技能</b>：<font style="color: #206941">■技能■</font> セクション</p>
+                            <p><b> ダメージボーナス（DB）</b>：<font style="color: #b33e3e">■戦闘■</font> セクション</p>
+                        </li>
+                    </ul>
+                </p>
+            </details>
         </div>
         <form>
             <div id="dropzone", effectAllowed="move">
