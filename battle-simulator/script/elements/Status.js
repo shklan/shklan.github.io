@@ -12,12 +12,22 @@ export default class Status {
         this._state.set("INT", 0);
         this._state.set("EDU", 0);
         this._san = 0;
-        this._db = "0";
+        this._avoidance = 0;
+        this._db = "+0";
+        this.san_auto = true;
+        this.avoidance_auto = true;
     }
     setStatus(name, val) {
         if (this._state.has(name))
             this._state.set(name, val);
-        this._setDefaultSan();
+        // console.log(name + ' -> ' + val);
+        this.updateDefaultStatus();
+    }
+    updateDefaultStatus() {
+        if (this.san_auto)
+            this._setDefaultSan();
+        if (this.avoidance_auto)
+            this._setDefaultAvoidance();
         this._setDefaultDb();
     }
     getKeys() {
@@ -26,8 +36,31 @@ export default class Status {
     getStatus(name) {
         return this._state.get(name);
     }
+    getSan() {
+        return this._san;
+    }
+    getAvoidance() {
+        return this._avoidance;
+    }
+    setSan(new_value) {
+        if (!this.san_auto)
+            this._san = new_value;
+        else
+            this._setDefaultSan();
+        console.log(this._san);
+    }
+    setAvoidance(new_value) {
+        if (!this.avoidance_auto)
+            this._avoidance = new_value;
+        else
+            this._setDefaultAvoidance();
+        console.log(this._avoidance);
+    }
     _setDefaultSan() {
         this._san = this._state.get("POW") * 5;
+    }
+    _setDefaultAvoidance() {
+        this._avoidance = this._state.get("DEX") * 2;
     }
     _setDefaultDb() {
         const str = this._state.get("STR");
@@ -40,12 +73,12 @@ export default class Status {
             else if (base > -8 && base <= 0)
                 this._db = "-1d4";
             else if (base > 0 && base <= 8)
-                this._db = "0";
+                this._db = "+0";
             else if (base > 8 && base <= 16)
-                this._db = "1d4";
+                this._db = "+1d4";
         }
         else {
-            this._db = dice + "d6";
+            this._db = "+" + dice + "d6";
         }
     }
 }

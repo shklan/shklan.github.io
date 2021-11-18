@@ -1,24 +1,23 @@
 import { Actor } from './module';
 
 export default class ActorList {
-    private actor_list: Array<Actor>;
+    private _actor_list: Array<Actor>;
 
     constructor() {
-        this.actor_list = new Array<Actor>();
+        this._actor_list = new Array<Actor>();
     }
 
-    public addActor(e: Event): void {
+    public actorAddListener(e: Event): void {
         const button: HTMLButtonElement = e.currentTarget as HTMLButtonElement;
         const actor_list_html: HTMLDivElement = button.parentElement!.nextElementSibling! as HTMLDivElement;
         const new_actor: Actor = new Actor();
         const new_element: HTMLDivElement = new_actor.createElement();
-        new_element.addEventListener('click', this._deleteActor.bind(this));
-        console.log(this.actor_list);
+        new_element.addEventListener('click', this._actorDeleteListener.bind(this));
         actor_list_html.appendChild(new_element);
-        this.actor_list.push(new_actor);
+        this._actor_list.push(new_actor);
     }
 
-    private _deleteActor(e: Event): void {
+    private _actorDeleteListener(e: Event): void {
         const target = e.target;
         if (target instanceof HTMLButtonElement) {
             const target_actor_element = e.currentTarget! as HTMLDivElement;
@@ -27,11 +26,13 @@ export default class ActorList {
             const index = children_element.indexOf(target_actor_element);
             
             actors_element.removeChild(target_actor_element);
-            this.actor_list.splice(index, 1);
-            console.log(this.actor_list);
-            console.log(index);
+            this._actor_list.splice(index, 1);
             console.log('deleted');
         }
+    }
+
+    public getActorLength(): number {
+        return this._actor_list.length;
     }
 
 }

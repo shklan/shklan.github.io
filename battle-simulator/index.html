@@ -8,27 +8,38 @@
         </title>
         <style>
             .introduction {display: block; padding-bottom: 25px; padding-top: 30px; margin: auto;}
-            .text-centering {text-align: center;}
+            .centering {text-align: center;}
             .stage {width: 90vw; display: flex; margin: 0 auto; padding: 0;}
-            .actor-root {padding: 5px; display: block;}
-            .actor {border: 1px solid #1f1e33; border-radius: 4px; display: block; padding-left: 5px;}
+            .friends {background-color: #8effb5;}
+            .enemies {background-color: #ffc2c2;}
+            .actor-root {padding: 5px; display: block; background-color: #f1f1e8;}
+            .actor {border: 1px solid #1f1e33; border-radius: 4px; display: block; padding-left: 5px; padding-right: 5px;}
             .actors {width: 40vw; display: block; margin: 0 auto; padding: 0;}
-            .friends {background-color: #b9ffd1;}
-            .enemies {background-color: #ffdfdf;}
+            .name {display: flex; padding-left: 1%;}
+            .name-description {width:50px;}
+            .option-root {width: 90%; display: flex; padding-left: 1%;}
+            .option {padding-right: 10px; width: 60px;}
+            .option-short-description {width: 80px;}
+            .option-description {width: 100px;}
+            .option-long-description {width: 300px;}
+            .action-root {padding: 5px;}
+            .action {border: 1px solid #331e1f; border-radius: 4px; display: flex;}
+            .input {width: 50px; overflow: auto;}
+            /* .name-input {} */
             .status {width: 100%; overflow: auto;}
             .status-table {width: 90%;}
-            .status-input {width: 40px; overflow: hidden;}
+            .status-input {width: 40px;}
             #dropzone {min-height: 60px; width: 1180px; background-color: #eee;}
             #status {display: block; width: 430px;}
             #profile {display: block; width: 430px;}
             form {width: 100%; padding: 5px; }
-            /* input {min-width: 180px;} */
+            /* input {width: 90%;} */
             /* select {min-width: 180px;} */
         </style>
     </head>
     
     <body>
-        <div class="introduction text-centering">
+        <div class="introduction centering">
         CoC戦闘シミュレーターです．<br>
         <!-- キャラクターシートを読み込ませることで，技能値のチェックが出来ます．<br>
         赤い表示の技能値は技能値が制約を超えていることを表します．<br> -->
@@ -41,18 +52,25 @@
                 <input id="Reset" multiple type="reset", value="クリア">
             </div> 
         </form> -->
+        <div class="start centering">
+            <button class="start-battle">戦闘開始</button>
+        </div>
         <div class="stage">
-            <div class="actors friends">
-                <div class="operation">
+            <div class="actors">
+                <div class="friends">味方だよ</div>
+                <div class="operation friends">
                     <button class="add-actor">追加</button>
                 </div>
                 <!-- 味方だよ -->
-                <div id="friend-list">一覧だよ</div>
+                <div id="friend-list"></div>
             </div>
-            <div class="actors enemies">
-                <div class="operation"></div>
+            <div class="actors">
+                <div class="enemies">敵だよ</div>
+                <div class="operation enemies">
+                    <button class="add-actor">追加</button>
+                </div>
                 <!-- 敵だよ -->
-                <div id="enemy-list">一覧だよ</div>
+                <div id="enemy-list"></div>
             </div>
         </div>
     </body>
