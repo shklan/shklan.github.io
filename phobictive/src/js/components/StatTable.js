@@ -62,7 +62,7 @@ export default class StatTable extends React.Component {
                                 value={this.props.stats["教養力"]}
                                 onChange={(e) => this.setStat("教養力", e)}
                             />
-                        </td> 
+                        </td>
                     </tr>
                 </tbody></table>
             </div>
